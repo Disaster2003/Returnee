@@ -1,0 +1,5 @@
+newmtl None_Sword_inkwizitor_texture
+Kd 0.8 0.8 0.8
+map_Kd sword_rune_texture_color1024.dds
+illum 2
+

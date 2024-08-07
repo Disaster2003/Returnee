@@ -1,0 +1,6 @@
+newmtl sticker_dragon (Instance)
+Kd 1 1 1
+Ke 0 0 0
+map_Kd sticker_dragon.dds
+illum 2
+

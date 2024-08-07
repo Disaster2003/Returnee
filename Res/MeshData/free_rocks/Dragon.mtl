@@ -1,0 +1,7 @@
+newmtl Dragon_col_001
+Kd 1 1 1
+Ks 0.1176471 0.1176471 0.1176471
+map_Kd Dragon_col_001.dds
+map_Bump Dragon_nor_001.dds
+illum 2
+

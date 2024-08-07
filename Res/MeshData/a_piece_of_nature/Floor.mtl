@@ -1,0 +1,8 @@
+newmtl Stylized Stones
+Kd 1 1 1
+Ks 0.1037736 0.1037736 0.1037736
+Ke 0 0 0
+map_Kd Vol_27_4_Base_Color.dds
+map_Bump Vol_27_4_Normal.dds
+illum 2
+

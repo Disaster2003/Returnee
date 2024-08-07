@@ -1,0 +1,8 @@
+newmtl Chest
+Kd 1 1 1
+Ks 0.5 0.5 0.5
+Ke 0 0 0
+map_Kd Chest_texture.dds
+map_Bump Chest_normal.dds
+illum 2
+

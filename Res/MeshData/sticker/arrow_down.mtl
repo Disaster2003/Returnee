@@ -1,0 +1,6 @@
+newmtl sticker_arrow_down (Instance)
+Kd 1 1 1
+Ke 0 0 0
+map_Kd sticker_arrow_down.dds
+illum 2
+

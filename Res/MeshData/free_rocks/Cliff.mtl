@@ -1,0 +1,7 @@
+newmtl rocks
+Kd 1 1 1
+Ke 0 0 0
+map_Kd rocks_diff_spec.dds
+map_Bump rocks_nm.dds
+illum 2
+
