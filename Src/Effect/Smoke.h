@@ -54,7 +54,7 @@ public:
     }
 
 private:
-    static constexpr float LIFE_SPAN = 1.0f; // ‰Œ‚ÌŽõ–½(s)
+    static constexpr float LIFE_SPAN = 0.5f; // ‰Œ‚ÌŽõ–½(s)
 };
 
 #endif // !SMOKE_H_INCLUDED

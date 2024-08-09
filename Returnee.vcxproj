@@ -178,7 +178,6 @@
     <ClInclude Include="Src\Character\Player\PlayerComponent.h" />
     <ClInclude Include="Src\Character\Player\WeaponAttackCollider.h" />
     <ClInclude Include="Src\Effect\BloodParticle.h" />
-    <ClInclude Include="Src\Effect\GuardEffect.h" />
     <ClInclude Include="Src\Effect\MagicMissileParticle.h" />
     <ClInclude Include="Src\Effect\Mist.h" />
     <ClInclude Include="Src\Effect\Particle.h" />
@@ -220,6 +219,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="feedback.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -47,11 +47,15 @@ public:
             enemy->TakeDamage(damage, player->GetOwner());
 
             // ŒŒ‚µ‚Ô‚«
+            auto player_owner = player->GetOwner();
             for (int i = 0; i < 5; ++i)
             {
-                vec3 position_blood = enemy->GetOwner()->position;
-                position_blood.y += 1;
-                auto hitEffect = enemy->GetOwner()->GetEngine()->Create<GameObject>("hit effect", position_blood);
+                // ³–Ê‚ðŒˆ’è‚·‚é
+                const vec3 dirFront = { sin(player_owner->rotation.y), 0, cos(player_owner->rotation.y) };
+
+                // ”­“®‚ð•\‚·‰Œ‚ð•\Ž¦‚·‚é
+                vec3 position_effect = player_owner->position - dirFront;
+                auto hitEffect = enemy->GetOwner()->GetEngine()->Create<GameObject>("hit effect", position_effect);
                 hitEffect->AddComponent<BloodParticle>();
             }
         }

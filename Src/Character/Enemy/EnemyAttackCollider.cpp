@@ -3,7 +3,6 @@
 */
 #include "EnemyAttackCollider.h"
 #include "../Player/PlayerComponent.h"
-#include "../../Effect/GuardEffect.h"
 
 /// <summary>
 /// 衝突時に衝突した相手によって処理を行う
@@ -20,6 +19,7 @@ void EnemyAttackCollider::OnCollision
     if (EnemyAttackCollider::GetState() != STATE_ATTACK_COLLIDER::COLLISION_DISABLE)
         return;
 
+    auto engine = GetOwner()->GetEngine();
     auto otherObject = other->GetOwner();
     // プレイヤーと衝突したなら
     if (otherObject->name == "player")
@@ -31,13 +31,19 @@ void EnemyAttackCollider::OnCollision
             // ガード成功
             EasyAudio::PlayOneShot(SE::sword_guard);
             player->SetAfterGuard();
+            auto player_owner = player->GetOwner();
             // ガードエフェクト
             for (int i = 0; i < 5; ++i)
             {
-                vec3 position_effect = (GetOwner()->GetParent()->position - player->GetOwner()->position) / 2 + player->GetOwner()->position;
-                position_effect += 1;
-                auto effect_guard = GetOwner()->GetEngine()->Create<GameObject>("guard effect", position_effect);
-                effect_guard->AddComponent<GuardEffect>();
+                // 正面を決定する
+                const vec3 dirFront = { sin(player_owner->rotation.y), 0, cos(player_owner->rotation.y) };
+
+                // 発動を表す煙を表示する
+                vec3 position_effect = player_owner->position - dirFront;
+                auto effect_guard = engine->Create<GameObject>("guard effect", position_effect);
+                effect_guard->AddComponent<BloodParticle>();
+                effect_guard->materials[0]->texBaseColor = engine->GetTexture("Res/guard_effect.tga");
+                effect_guard->materials[0]->texEmission = engine->GetTexture("Res/guard_effect.tga");
             }
         }
         else

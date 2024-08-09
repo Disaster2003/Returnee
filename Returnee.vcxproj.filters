@@ -209,9 +209,6 @@
     <ClInclude Include="Src\Effect\BloodParticle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Effect\GuardEffect.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="Src\Effect\MagicMissileParticle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -269,5 +266,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="feedback.txt" />
   </ItemGroup>
 </Project>

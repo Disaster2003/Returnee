@@ -79,7 +79,7 @@ private:
 	// 「死」する
 	void DoDead(float deltaTime);
 
-	static constexpr int HEALTH_MAX = 10; // 体力最大値
+	static constexpr int HEALTH_MAX = 5; // 体力最大値
 
 	// オークの状態
 	enum class STATE_ORC
