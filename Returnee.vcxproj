@@ -219,6 +219,25 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Res\down_sampling.frag" />
+    <None Include="Res\GameObjectMap.json" />
+    <None Include="Res\high_pass_filter.frag" />
+    <None Include="Res\image_processing.frag" />
+    <None Include="Res\sao.frag" />
+    <None Include="Res\sao_blur.frag" />
+    <None Include="Res\sao_down_sampling.frag" />
+    <None Include="Res\sao_restore_depth.frag" />
+    <None Include="Res\shadow.frag" />
+    <None Include="Res\shadow.vert" />
+    <None Include="Res\shadow_skeletal.vert" />
+    <None Include="Res\simple.frag" />
+    <None Include="Res\simple.vert" />
+    <None Include="Res\skeletal.vert" />
+    <None Include="Res\standard.frag" />
+    <None Include="Res\standard.vert" />
+    <None Include="Res\unlit.frag" />
+    <None Include="Res\unlit.vert" />
+    <None Include="Res\up_sampling.frag" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="feedback.txt" />
