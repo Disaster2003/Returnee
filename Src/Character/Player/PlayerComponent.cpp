@@ -49,7 +49,7 @@ void PlayerComponent::Awake()
 	for (float i = 0; i < 2; ++i)
 	{
 		auto collider = owner->AddComponent<SphereCollider>();
-		collider->sphere.radius = 0.7f;
+		collider->sphere.radius = 1;
 		collider->sphere.position.y = -0.5f * i;
 	}
 
@@ -435,7 +435,7 @@ void PlayerComponent::AttackInitialize
 			attackCollider_right_arm->SetDamage(ATTAK_NORMAL);
 
 		// UŒ‚”»’è‚ðÝ’è‚·‚é
-		attackCollider_right_arm->Activate(1.0f);
+		attackCollider_right_arm->Activate(2.0f);
 	}
 	else
 	{
