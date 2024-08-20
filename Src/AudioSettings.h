@@ -8,6 +8,7 @@
 namespace AudioPlayer
 {
 	inline constexpr int bgm = 0; // BGMの再生に使うプレイヤー番号
+	inline constexpr int run = 1; // BGMの再生に使うプレイヤー番号
 }
 
 // BGM設定
@@ -25,6 +26,7 @@ namespace SE
 {
 	inline constexpr char click[] = "Res/Audio/se/click.mp3";						// クリック音
 	inline constexpr char goal[] = "Res/Audio/se/goal.mp3";							// ゴールに到達した
+	inline constexpr char player_run[] = "Res/Audio/se/player_run.wav";			// 走る
 	inline constexpr char player_dead[] = "Res/Audio/se/player_dead.mp3";			// 敵にやられた
 	inline constexpr char player_jump[] = "Res/Audio/se/player_jump.mp3";			// ジャンプ
 	inline constexpr char player_land[] = "Res/Audio/se/player_land.mp3";			// 着地

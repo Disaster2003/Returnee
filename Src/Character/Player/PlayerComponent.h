@@ -95,7 +95,7 @@ private:
 		time_invincible = 0.0f, // 無敵時間
 		breath_scale = 0.0f;	// 呼吸運動の大きさ
 
-	static constexpr float POWER_BASE = 0.1f;
+	static constexpr float POWER_BASE = 4;
 
 	bool isRunning = false,		 // プレイヤーがture = 走っている、　　　false = 走っていない
 		isJumping = false,		 // プレイヤーがtrue = ジャンプしている、false = ジャンプしていない

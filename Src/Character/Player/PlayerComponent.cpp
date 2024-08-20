@@ -3,6 +3,7 @@
 */
 #include "PlayerComponent.h"
 #include "../../Engine/SphereCollider.h"
+#include "../../Effect/SwordSwingParticle.h"
 #include "../../Engine/Debug.h"
 
 /// <summary>
@@ -152,6 +153,9 @@ void PlayerComponent::Update(float deltaTime)
 		// 後退する
 		Move(camera, deltaTime, 1, cameraSpeed * cameraSin * 1.5f, cameraSpeed * cameraCos * 1.5f);
 
+	if(!isRunning)
+		EasyAudio::Stop(AudioPlayer::run);
+
 	// スペースキーが押されたら、ジャンプする
 	Jump(camera, deltaTime);
 
@@ -164,18 +168,28 @@ void PlayerComponent::Update(float deltaTime)
 			// 呼吸運動を行う
 			hand->rotation.x = sin(breath_scale) * 0.01f * ((isRunning) ? 30 : 5) + old_x;
 
-		// 攻撃の待機時間がなくなったら
+		// 攻撃準備
 		if(time_swing <= 0)
-			// Eキーが押されたら
 			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
 			{
 				// 剣の回転角度を戻す
-				hand->rotation.x = old_x;
+				hand->rotation.x = old_x + radians(-45);
 				hand->rotation.y = old_y;
 
 				// 1撃目の準備をする
 				EasyAudio::PlayOneShot(SE::player_attack_first);
 				isNextSwinging = true;
+				// 斬撃エフェクトの生成
+				{
+					// 正面を決定する
+					const vec3 dirFront = { sin(camera.rotation.y), 0, cos(camera.rotation.y) };
+
+					// 発動を表す煙を表示する
+					vec3 position_effect = camera.position - dirFront;
+					auto effect_swing = engine->Create<GameObject>("swing effect", position_effect);
+					effect_swing->AddComponent<SwordSwingParticle>();
+					effect_swing->scale.x *= 0.1f;
+				}
 				AttackInitialize(STATE_SWORD::FIRST_SWING, STATE_SWORD::FIRST_SWING);
 				break;
 			}
@@ -214,19 +228,36 @@ void PlayerComponent::Update(float deltaTime)
 				isFinishedClick = true;
 
 		// 剣の位置が初期位置以上に戻ったら
-		if (hand->rotation.x < old_x)
+		if (hand->rotation.x > old_x + radians(90))
 		{
 			// 剣の回転角度を戻す
-			hand->rotation.x = old_x;
+			hand->rotation.x = old_x + radians(-45);
+			hand->rotation.y = old_y + radians(-30);
 
 			// 2撃目の準備をする / 攻撃を終了する
 			if (isNextSwinging)
+			{
 				EasyAudio::PlayOneShot(SE::player_attack_second);
+				// 斬撃エフェクトの生成
+				{
+					// 正面を決定する
+					const vec3 dirFront = { sin(camera.rotation.y), 0, cos(camera.rotation.y) };
+
+					// 発動を表す煙を表示する
+					vec3 position_effect = camera.position - dirFront;
+					auto effect_swing = engine->Create<GameObject>("swing effect", position_effect);
+					effect_swing->AddComponent<SwordSwingParticle>();
+					effect_swing->scale.x *= 0.1f;
+					effect_swing->rotation.z = radians(-45);
+				}
+			}
 			AttackInitialize(STATE_SWORD::SECOND_SWING, STATE_SWORD::IDLE);
 		}
 		break;
 	case PlayerComponent::STATE_SWORD::SECOND_SWING:
 		// 2撃目の処理を行う
+		SwordSwing(deltaTime, hand->rotation.x);
+		anti_power -= deltaTime * 0.01f;
 		SwordSwing(deltaTime, hand->rotation.y);
 
 		// クリック判定が終了していたら
@@ -244,26 +275,40 @@ void PlayerComponent::Update(float deltaTime)
 				isFinishedClick = true;
 
 		// 剣の位置が初期位置以上に戻ったら
-		if (hand->rotation.y < old_y)
+		if (hand->rotation.x > old_x + radians(90))
 		{
 			// 剣の回転角度を戻す
-			hand->rotation.y = old_y;
+			hand->rotation.x = old_x + radians(-45);
+			hand->rotation.y = old_y + radians(30);
 
 			// 3撃目の準備をする / 攻撃を終了する
 			if (isNextSwinging)
+			{
 				EasyAudio::PlayOneShot(SE::player_attack_third);
+				// 斬撃エフェクトの生成
+				{
+					// 正面を決定する
+					const vec3 dirFront = { sin(camera.rotation.y), 0, cos(camera.rotation.y) };
+
+					// 発動を表す煙を表示する
+					vec3 position_effect = camera.position - dirFront;
+					auto effect_swing = engine->Create<GameObject>("swing effect", position_effect);
+					effect_swing->AddComponent<SwordSwingParticle>();
+					effect_swing->scale.x *= 0.1f;
+					effect_swing->rotation.z = radians(45);
+				}
+			}
 			AttackInitialize(STATE_SWORD::THIRD_SWING, STATE_SWORD::IDLE);
 		}
 		break;
 	case PlayerComponent::STATE_SWORD::THIRD_SWING:
 		// 3撃目の処理を行う
 		SwordSwing(deltaTime, hand->rotation.x);
-		anti_power -= 0.005f;
-		SwordSwing(deltaTime, hand->rotation.y);
+		anti_power -= deltaTime * 0.01f;
+		SwordSwing(-deltaTime, hand->rotation.y);
 
 		// 剣の位置が初期位置以上に戻ったら
-		if (hand->rotation.x < old_x &&
-			hand->rotation.y < old_y)
+		if (hand->rotation.x > old_x + radians(90))
 		{
 			// 剣の回転角度を戻す
 			hand->rotation.x = old_x;
@@ -346,6 +391,8 @@ void PlayerComponent::Move
 {
 	// 走行状態
 	isRunning = true;
+	if (!EasyAudio::IsPlaying(AudioPlayer::run))
+		EasyAudio::Play(AudioPlayer::run, SE::player_run, 1, true);
 
 	// PlusOrMinus方向に移動する
 	camera.position.x += deltaTime * x_movement_amount * PlusOrMinus;
@@ -366,8 +413,8 @@ void PlayerComponent::Jump
 	// ジャンプ中なら
 	if (isJumping)
 	{
-		camera.position.y += POWER_BASE - gravity;
-		gravity += deltaTime * 0.1f;
+		camera.position.y += (POWER_BASE - gravity) * deltaTime;
+		gravity += deltaTime * 0.01f;
 		// 地面についたら
 		if (camera.isGrounded)
 		{
@@ -402,8 +449,8 @@ void PlayerComponent::SwordSwing
 	float& rotation_hand
 )
 {
-	rotation_hand += POWER_BASE - anti_power;
-	anti_power += deltaTime * 0.3f;
+	rotation_hand += (POWER_BASE - anti_power) * deltaTime;
+	anti_power += deltaTime * 0.01f;
 }
 
 /// <summary>
@@ -500,6 +547,7 @@ void PlayerComponent::TakeDamage
 		state_player = STATE_PLAYER::DEAD;
 		// GameOverBGMを再生する
 		EasyAudio::Stop(AudioPlayer::bgm);
+		EasyAudio::Stop(AudioPlayer::run);
 		EasyAudio::Play(AudioPlayer::bgm, BGM::game_over, 1, true);
 		EasyAudio::PlayOneShot(SE::player_dead);
 	}

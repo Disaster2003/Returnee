@@ -48,7 +48,7 @@ public:
     virtual void Update(float deltaTime) override
     {
         auto owner = GetOwner();
-        velocity.y -= deltaTime;
+        velocity.y -= 9.81f * deltaTime;
         owner->position += velocity * deltaTime;          // ã‚ÉˆÚ“®
         owner->rotation.z += random_rotation * deltaTime; // ‰ñ“]
         owner->scale += vec3(deltaTime);           // ™X‚ÉŠg‘å

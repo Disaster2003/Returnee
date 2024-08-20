@@ -263,6 +263,9 @@
     <ClInclude Include="Src\MikkTSpace\mikktspace.h">
       <Filter>ソース ファイル\MikkTSpace</Filter>
     </ClInclude>
+    <ClInclude Include="Src\Effect\SwordSwingParticle.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

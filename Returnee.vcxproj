@@ -183,6 +183,7 @@
     <ClInclude Include="Src\Effect\Particle.h" />
     <ClInclude Include="Src\Effect\Smoke.h" />
     <ClInclude Include="Src\Effect\Stardust.h" />
+    <ClInclude Include="Src\Effect\SwordSwingParticle.h" />
     <ClInclude Include="Src\Engine\AabbCollider.h" />
     <ClInclude Include="Src\Engine\Animation.h" />
     <ClInclude Include="Src\Engine\Billboard.h" />
