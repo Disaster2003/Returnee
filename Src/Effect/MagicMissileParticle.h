@@ -55,7 +55,7 @@ public:
     }
 
 private:
-    static constexpr float LIFE_SPAN = 0.2f; // パーティクルの寿命(s)
+    static constexpr float LIFE_SPAN = 0.25f; // パーティクルの寿命(s)
 };
 
 #endif // !MAGICMISSILEPARTICLE_H_INCLUDED

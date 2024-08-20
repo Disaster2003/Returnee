@@ -8,7 +8,9 @@
 #include <Windows.h>
 #pragma warning(pop)
 
-// エントリーポイント
+/// <summary>
+/// エントリーポイント
+/// </summary>
 int WINAPI WinMain
 (
 	_In_ HINSTANCE hInstnce,

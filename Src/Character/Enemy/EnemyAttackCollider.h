@@ -27,7 +27,7 @@ public:
 	void SetDamage(float _damage);
 
 private:
-    float damage = 0.0f; // ダメージ量
+    float damage = 0; // ダメージ量
 };
 
 #endif // !ENEMYATTACKCOLLIDER_H_INCLUDED

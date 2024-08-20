@@ -3,7 +3,7 @@
 */
 #include "PlayerComponent.h"
 #include "../../Engine/SphereCollider.h"
-#include "../../Effect/SwordSwingParticle.h"
+#include "../../Effect/SwordSwingEffect.h"
 #include "../../Engine/Debug.h"
 
 /// <summary>
@@ -23,7 +23,7 @@ public:
 		// 一定時間経ったら
 		if (lifespan <= 0)
 		{
-			// 自身を破棄する
+			// フレームを破棄する
 			owner->Destroy();
 			return;
 		}
@@ -131,71 +131,89 @@ void PlayerComponent::Update(float deltaTime)
 	// カーソルの非表示
 	engine->HideMouseCursor();
 
-	isRunning = false;
-	const float cameraSpeed = 5;
-	const float cameraCos = cos(camera.rotation.y);
-	const float cameraSin = sin(camera.rotation.y);
+	// 移動処理
+	{
+		isRunning = false;
+		const float cameraSpeed = 5;
+		const float cameraCos = cos(camera.rotation.y);
+		const float cameraSin = sin(camera.rotation.y);
 
-	// Aキーが押されたら
-	if (engine->GetKey(GLFW_KEY_A))
-		// 左に移動する
-		Move(camera, deltaTime, -1, cameraSpeed * cameraCos, cameraSpeed * -cameraSin);
-	// Dキーが押されたら
-	if (engine->GetKey(GLFW_KEY_D))
-		// 右に移動する
-		Move(camera, deltaTime, 1, cameraSpeed * cameraCos, cameraSpeed * -cameraSin);
-	// Wキーが押されたら
-	if (engine->GetKey(GLFW_KEY_W))
 		// 前進する
-		Move(camera, deltaTime, -1, cameraSpeed * cameraSin * 2, cameraSpeed * cameraCos * 2);
-	// Sキーが押されたら
-	if (engine->GetKey(GLFW_KEY_S))
+		if (engine->GetKey(GLFW_KEY_W))
+			Move(camera, deltaTime, -1, cameraSpeed * cameraSin * 2, cameraSpeed * cameraCos * 2);
 		// 後退する
-		Move(camera, deltaTime, 1, cameraSpeed * cameraSin * 1.5f, cameraSpeed * cameraCos * 1.5f);
+		if (engine->GetKey(GLFW_KEY_S))
+			Move(camera, deltaTime, 1, cameraSpeed * cameraSin * 1.5f, cameraSpeed * cameraCos * 1.5f);
+		// 左に移動する
+		if (engine->GetKey(GLFW_KEY_A))
+			Move(camera, deltaTime, -1, cameraSpeed * cameraCos, cameraSpeed * -cameraSin);
+		// 右に移動する
+		if (engine->GetKey(GLFW_KEY_D))
+			Move(camera, deltaTime, 1, cameraSpeed * cameraCos, cameraSpeed * -cameraSin);
 
-	if(!isRunning)
-		EasyAudio::Stop(AudioPlayer::run);
+		// 走行音停止
+		if (!isRunning)
+			EasyAudio::Stop(AudioPlayer::run);
+	}
+
+	// 視点移動処理
+	{
+		static constexpr float SPEED_MOVE_CAMERA = 0.3f; // 視点移動の速さ
+		static constexpr float CAMERA_ANGLE_MAX = 0.6f;	 // 上下視点の最大値
+
+		// マウスを横方向に動かした分、カメラのY軸回転を行う
+		if (abs(engine->GetMouseMovement().x) > 1)
+			camera.rotation.y -= engine->GetMouseMovement().x * deltaTime * SPEED_MOVE_CAMERA;
+
+		// マウスを縦方向に動かした分、カメラのX軸回転を行う
+		if (abs(engine->GetMouseMovement().y) > 1 &&
+			camera.rotation.x < CAMERA_ANGLE_MAX &&
+			camera.rotation.x > -CAMERA_ANGLE_MAX)
+			camera.rotation.x -= engine->GetMouseMovement().y * deltaTime * SPEED_MOVE_CAMERA;
+		// 上向きの限度
+		else if (camera.rotation.x >= CAMERA_ANGLE_MAX)
+			camera.rotation.x = CAMERA_ANGLE_MAX - 0.01f;
+		// 下向きの限度
+		else if (camera.rotation.x <= -CAMERA_ANGLE_MAX)
+			camera.rotation.x = -CAMERA_ANGLE_MAX + 0.01f;
+	}
 
 	// スペースキーが押されたら、ジャンプする
 	Jump(camera, deltaTime);
 
+#pragma region ATTACK_AND_GUARD
 	auto hand = camera.GetChild(0);	// player.hand
 	switch (state_sword)
 	{
 	case PlayerComponent::STATE_SWORD::IDLE:
-		// 接地していたら
+		// 接地していたら、呼吸運動を行う
 		if (camera.isGrounded)
-			// 呼吸運動を行う
 			hand->rotation.x = sin(breath_scale) * 0.01f * ((isRunning) ? 30 : 5) + old_x;
 
-		// 攻撃準備
+		// 1撃目の準備
 		if(time_swing <= 0)
 			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
 			{
-				// 剣の回転角度を戻す
+				// 剣の回転角度の設定
 				hand->rotation.x = old_x + radians(-45);
 				hand->rotation.y = old_y;
 
-				// 1撃目の準備をする
-				EasyAudio::PlayOneShot(SE::player_attack_first);
+				// 1撃目の準備を進める
 				isNextSwinging = true;
-				// 斬撃エフェクトの生成
+				if (isNextSwinging)
 				{
-					// 正面を決定する
-					const vec3 dirFront = { sin(camera.rotation.y), 0, cos(camera.rotation.y) };
+					// 1撃目の効果音を再生する
+					EasyAudio::PlayOneShot(SE::player_attack_first);
 
-					// 発動を表す煙を表示する
-					vec3 position_effect = camera.position - dirFront;
-					auto effect_swing = engine->Create<GameObject>("swing effect", position_effect);
-					effect_swing->AddComponent<SwordSwingParticle>();
-					effect_swing->scale.x *= 0.1f;
+					// 斬撃跡を生成する
+					CreateSwordSlashEffect(camera, 0);
+
+					AttackInitialize(STATE_SWORD::FIRST_SWING, STATE_SWORD::FIRST_SWING);
 				}
-				AttackInitialize(STATE_SWORD::FIRST_SWING, STATE_SWORD::FIRST_SWING);
 				break;
 			}
-		// ガードの待機時間がなくなったら
+		// ガードの準備
 		if(time_guard <= 0)
-			// Qキーが押されたら
 			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_RIGHT))
 			{
 				// 剣の回転角度を戻す
@@ -210,167 +228,134 @@ void PlayerComponent::Update(float deltaTime)
 			}
 		break;
 	case PlayerComponent::STATE_SWORD::FIRST_SWING:
-		// 1撃目の処理を行う
-		SwordSwing(deltaTime, hand->rotation.x);
-
-		// クリック判定が終了していたら
-		if (isFinishedClick)
-			// 左クリックしたら
-			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
-				// +1撃追加する
-				isNextSwinging = true;
-
-		// クリック判定が終了になっていなかったら
-		if (!isFinishedClick)
-			// 左クリックしていないなら
-			if (!engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
-				// クリック判定を終了する
-				isFinishedClick = true;
-
-		// 剣の位置が初期位置以上に戻ったら
-		if (hand->rotation.x > old_x + radians(90))
+		// 剣を振り切ったら、2撃目の準備をする / 攻撃を終了する
+		if (hand->rotation.x > old_x + radians(45))
 		{
-			// 剣の回転角度を戻す
-			hand->rotation.x = old_x + radians(-45);
-			hand->rotation.y = old_y + radians(-30);
-
-			// 2撃目の準備をする / 攻撃を終了する
-			if (isNextSwinging)
+			if (time_swing <= 0)
 			{
-				EasyAudio::PlayOneShot(SE::player_attack_second);
-				// 斬撃エフェクトの生成
-				{
-					// 正面を決定する
-					const vec3 dirFront = { sin(camera.rotation.y), 0, cos(camera.rotation.y) };
+				// 剣の回転角度を戻す
+				hand->rotation.x = old_x;
+				hand->rotation.y = old_y;
 
-					// 発動を表す煙を表示する
-					vec3 position_effect = camera.position - dirFront;
-					auto effect_swing = engine->Create<GameObject>("swing effect", position_effect);
-					effect_swing->AddComponent<SwordSwingParticle>();
-					effect_swing->scale.x *= 0.1f;
-					effect_swing->rotation.z = radians(-45);
+				// 2撃目の準備を進める
+				if (isNextSwinging)
+				{
+					// 2撃目の効果音を再生する
+					EasyAudio::PlayOneShot(SE::player_attack_second);
+
+					// 斬撃跡の生成
+					CreateSwordSlashEffect(camera, -45);
+
+					// 剣の回転角度の設定
+					hand->rotation.x = old_x + radians(-45);
+					hand->rotation.y = old_y + radians(-30);
 				}
+
+				AttackInitialize(STATE_SWORD::SECOND_SWING, STATE_SWORD::IDLE);
 			}
-			AttackInitialize(STATE_SWORD::SECOND_SWING, STATE_SWORD::IDLE);
+		}
+		else
+		{
+			// 1撃目の処理を行う
+			SwordSwing(deltaTime, hand->rotation.x);
+
+			// +1撃加えるか判断する
+			ClickCheck();
 		}
 		break;
 	case PlayerComponent::STATE_SWORD::SECOND_SWING:
-		// 2撃目の処理を行う
-		SwordSwing(deltaTime, hand->rotation.x);
-		anti_power -= deltaTime * 0.01f;
-		SwordSwing(deltaTime, hand->rotation.y);
-
-		// クリック判定が終了していたら
-		if (isFinishedClick)
-			// 左クリックしたら
-			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
-				// +1撃追加する
-				isNextSwinging = true;
-
-		// クリック判定が終了になっていなかったら
-		if (!isFinishedClick)
-			// 左クリックしていないなら
-			if (!engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
-				// クリック判定を終了する
-				isFinishedClick = true;
-
-		// 剣の位置が初期位置以上に戻ったら
-		if (hand->rotation.x > old_x + radians(90))
+		// 剣を振り切ったら、3撃目の準備をする / 攻撃を終了する
+		if (hand->rotation.x > old_x + radians(30))
 		{
-			// 剣の回転角度を戻す
-			hand->rotation.x = old_x + radians(-45);
-			hand->rotation.y = old_y + radians(30);
-
-			// 3撃目の準備をする / 攻撃を終了する
-			if (isNextSwinging)
+			if (time_swing <= 0)
 			{
-				EasyAudio::PlayOneShot(SE::player_attack_third);
-				// 斬撃エフェクトの生成
-				{
-					// 正面を決定する
-					const vec3 dirFront = { sin(camera.rotation.y), 0, cos(camera.rotation.y) };
+				// 剣の回転角度を戻す
+				hand->rotation.x = old_x;
+				hand->rotation.y = old_y;
 
-					// 発動を表す煙を表示する
-					vec3 position_effect = camera.position - dirFront;
-					auto effect_swing = engine->Create<GameObject>("swing effect", position_effect);
-					effect_swing->AddComponent<SwordSwingParticle>();
-					effect_swing->scale.x *= 0.1f;
-					effect_swing->rotation.z = radians(45);
+				// 3撃目の準備を進める
+				if (isNextSwinging)
+				{
+					// 3撃目の効果音を再生する
+					EasyAudio::PlayOneShot(SE::player_attack_third);
+
+					// 斬撃跡の生成
+					CreateSwordSlashEffect(camera, 45);
+
+					// 剣の回転角度の設定
+					hand->rotation.x = old_x + radians(-45);
+					hand->rotation.y = old_y + radians(30);
 				}
+
+				AttackInitialize(STATE_SWORD::THIRD_SWING, STATE_SWORD::IDLE);
 			}
-			AttackInitialize(STATE_SWORD::THIRD_SWING, STATE_SWORD::IDLE);
+		}
+		else
+		{
+			// 2撃目の処理を行う
+			SwordSwing(deltaTime, hand->rotation.x);
+			anti_power -= 0.01f;
+			SwordSwing(deltaTime, hand->rotation.y);
+
+			// +1撃加えるか判断する
+			ClickCheck();
 		}
 		break;
 	case PlayerComponent::STATE_SWORD::THIRD_SWING:
-		// 3撃目の処理を行う
-		SwordSwing(deltaTime, hand->rotation.x);
-		anti_power -= deltaTime * 0.01f;
-		SwordSwing(-deltaTime, hand->rotation.y);
-
-		// 剣の位置が初期位置以上に戻ったら
-		if (hand->rotation.x > old_x + radians(90))
+		// 剣を振り切ったら、攻撃を終了する
+		if (hand->rotation.x > old_x + radians(30))
 		{
-			// 剣の回転角度を戻す
-			hand->rotation.x = old_x;
-			hand->rotation.y = old_y;
+			if (time_swing <= 0)
+			{
+				// 剣の回転角度を戻す
+				hand->rotation.x = old_x;
+				hand->rotation.y = old_y;
 
-			// 攻撃を終了する
-			AttackInitialize(STATE_SWORD::IDLE, STATE_SWORD::IDLE);
+				AttackInitialize(STATE_SWORD::IDLE, STATE_SWORD::IDLE);
+			}
+		}
+		else
+		{
+			// 3撃目の処理を行う
+			SwordSwing(deltaTime, hand->rotation.x);
+			anti_power -= deltaTime * 0.01f;
+			SwordSwing(-deltaTime, hand->rotation.y);
 		}
 		break;
 	case PlayerComponent::STATE_SWORD::GUARD:
-		// ガードの待機時間がなくなったら
+		// ガード終了
 		if (time_guard <= 0 || isGuarded)
 		{
-			// ガード終了
+			// 何もしていない状態に
+			state_sword = STATE_SWORD::IDLE;
 			isGuarded = false;
 
 			// 剣の回転角度を戻す
 			hand->rotation.y = old_y;
-
-			// 何もしていない状態に
-			state_sword = STATE_SWORD::IDLE;
 		}
 		break;
 	default:
 		break;
 	}
+#pragma endregion
 
-	// 無敵時間を減らす
-	if (time_invincible > 0)
-		time_invincible = std::max(time_invincible - deltaTime, 0.0f);
-	// 攻撃の待機時間
-	if (time_swing > 0)
-		time_swing -= deltaTime;
-	// ガードの待機時間
-	if (time_guard > 0)
-		time_guard -= deltaTime;
-	// 呼吸運動の大きさを加える
-	if (isRunning)
-		breath_scale += deltaTime * 10;
-	else
-		breath_scale += deltaTime;
-
-	static constexpr float SPEED_MOVE_CAMERA = 0.3f; // 視点移動の速さ
-	static constexpr float CAMERA_ANGLE_MAX = 0.6f;	 // 上下視点の最大値
-
-	// マウスを横方向に動かして、その動かした分の絶対値が1以上なら
-	if (abs(engine->GetMouseMovement().x) > 1)
-		// 動いた分、カメラのY軸回転を行う
-		camera.rotation.y -= engine->GetMouseMovement().x * deltaTime * SPEED_MOVE_CAMERA;
-
-	// マウスを縦方向に動かして、その動かした分の絶対値が1以上なら
-	if (abs(engine->GetMouseMovement().y) > 1 &&
-		camera.rotation.x < CAMERA_ANGLE_MAX &&
-		camera.rotation.x > -CAMERA_ANGLE_MAX)
-		// 動いた分、カメラのX軸回転を行う
-		camera.rotation.x -= engine->GetMouseMovement().y * deltaTime * SPEED_MOVE_CAMERA;
-	else if (camera.rotation.x >= CAMERA_ANGLE_MAX)
-		// 上向きの限度
-		camera.rotation.x =  CAMERA_ANGLE_MAX - 0.01f;
-	else if (camera.rotation.x <= -CAMERA_ANGLE_MAX)
-		// 下向きの限度
-		camera.rotation.x = -CAMERA_ANGLE_MAX + 0.01f;
+	// 時間経過
+	{
+		// 無敵時間を減らす
+		if (time_invincible > 0)
+			time_invincible = std::max(time_invincible - deltaTime, 0.0f);
+		// 攻撃の待機時間
+		if (time_swing > 0)
+			time_swing -= deltaTime;
+		// ガードの待機時間
+		if (time_guard > 0)
+			time_guard -= deltaTime;
+		// 呼吸運動の大きさを加える
+		if (isRunning)
+			breath_scale += deltaTime * 10;
+		else
+			breath_scale += deltaTime;
+	}
 }
 
 /// <summary>
@@ -415,23 +400,27 @@ void PlayerComponent::Jump
 	{
 		camera.position.y += (POWER_BASE - gravity) * deltaTime;
 		gravity += deltaTime * 0.01f;
-		// 地面についたら
+		// 地面についたら、ジャンプ解除
 		if (camera.isGrounded)
 		{
-			// ジャンプ解除
-			gravity = 0;
-			isJumping = false;
+			// 着地音を再生する
 			EasyAudio::PlayOneShot(SE::player_land);
+
+			// ジャンプ解除
+			isJumping = false;
+			gravity = 0;
 		}
 	}
 	else
 	{
-		// spaceキーが押されたら
+		// spaceキーが押されたらジャンプする
 		if (GetOwner()->GetEngine()->GetKey(GLFW_KEY_SPACE))
 		{
-			// ジャンプする
-			isJumping = true;
+			// ジャンプ音を再生する
 			EasyAudio::PlayOneShot(SE::player_jump);
+
+			// ジャンプ解除
+			isJumping = true;
 			gravity = 0;
 		}
 		else
@@ -454,6 +443,22 @@ void PlayerComponent::SwordSwing
 }
 
 /// <summary>
+/// +1撃加えるか判断する
+/// </summary>
+void PlayerComponent::ClickCheck()
+{
+	// +1撃追加する
+	if (isFinishedClick)
+		if (GetOwner()->GetEngine()->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
+			isNextSwinging = true;
+
+	// クリック判定の終了
+	if (!isFinishedClick)
+		if (!GetOwner()->GetEngine()->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
+			isFinishedClick = true;
+}
+
+/// <summary>
 /// 攻撃前に初期化する / 攻撃を終了する
 /// </summary>
 /// <param name="isNextSwinging">次攻撃するかどうか</param>
@@ -465,20 +470,19 @@ void PlayerComponent::AttackInitialize
 	STATE_SWORD finish
 )
 {
+	// 次の攻撃の準備をする
 	if (isNextSwinging)
 	{
-		// 次の攻撃の準備をする
 		isNextSwinging = false;
 		state_sword = next;
-		anti_power = 0;
-		time_swing = 0.2f;
 		isAttacking = true;
-		// ジャンプしてたら
+		time_swing = 0.5f;
+		anti_power = 0;
+
+		// ジャンプしてたら、ダメージ2倍
 		if (isJumping)
-			// ダメージ2倍
 			attackCollider_right_arm->SetDamage(ATTACK_SPECIAL);
 		else
-			// ダメージ等倍
 			attackCollider_right_arm->SetDamage(ATTAK_NORMAL);
 
 		// 攻撃判定を設定する
@@ -488,12 +492,33 @@ void PlayerComponent::AttackInitialize
 	{
 		// 攻撃を終了する
 		state_sword = finish;
-		time_swing = 1.0f;
 		isAttacking = false;
+		time_swing = 1.0f;
 	}
 
 	// クリック終了判定を戻す
 	isFinishedClick = false;
+}
+
+/// <summary>
+/// 斬撃跡を生成する
+/// </summary>
+/// <param name="_camera">カメラ</param>
+/// <param name="angle">斬撃跡の角度</param>
+void PlayerComponent::CreateSwordSlashEffect
+(
+	GameObject& _camera,
+	int angle
+)
+{
+	// 正面を決定する
+	const vec3 dirFront = { sin(_camera.rotation.y), 0, cos(_camera.rotation.y) };
+
+	// 斬撃跡を表示する
+	vec3 position_effect = _camera.position - dirFront;
+	auto effect_swing = GetOwner()->GetEngine()->Create<GameObject>("swing effect", position_effect);
+	effect_swing->AddComponent<SwordSwingEffect>();
+	effect_swing->rotation.z = radians(angle);
 }
 
 /// <summary>
@@ -532,20 +557,22 @@ void PlayerComponent::TakeDamage
 	if (time_invincible > 0)
 		return;
 
-	EasyAudio::PlayOneShot(SE::enemy_hit_attack);
+	// ダメージを受けた音を再生する
+	EasyAudio::PlayOneShot(SE::player_damage);
 
 	//// ダメージ倍率を適用
 	//damage = int(float(damage * GameState::Instance()->takenDamageRatio));
 
 	// 体力を減らす
 	PlayerComponent::SetHp(damage);
-	// 体力が0以下なら
+
+	// ゲームオーバー
 	if (PlayerComponent::GetHp() <= 0)
 	{
-		// ゲームオーバー
-		PlayerComponent::SetHp(0);
 		state_player = STATE_PLAYER::DEAD;
-		// GameOverBGMを再生する
+		PlayerComponent::SetHp(0);
+
+		// ゲームオーバーBGM/SEを再生する
 		EasyAudio::Stop(AudioPlayer::bgm);
 		EasyAudio::Stop(AudioPlayer::run);
 		EasyAudio::Play(AudioPlayer::bgm, BGM::game_over, 1, true);
@@ -570,7 +597,7 @@ void PlayerComponent::TakeDamage
 
 	// ダメージエフェクトを表示する
 	Engine* engine = GetOwner()->GetEngine();
-	auto damageFrame = engine->CreateUIObject<UILayout>("Res/DamageFrame.dds", vec2(0), 1);
+	auto damageFrame = engine->CreateUIObject<UILayout>("Res/UI_damage_frame.dds", vec2(0), 1);
 	damageFrame.first->AddComponent<DamageFrame>();
 }
 
@@ -585,14 +612,14 @@ void PlayerComponent::HpGauge(Engine* engine, float deltaTime)
 	if (!ui_hp_frame)
 	{
 		// 体力ゲージのフレームを生成する
-		ui_hp_frame = engine->CreateUIObject<UILayout>("Res/boss_hp_frame.dds", { -0.98f, 0.95f }, 0.05f).second;
+		ui_hp_frame = engine->CreateUIObject<UILayout>("Res/UI_hp_frame.dds", { -0.98f, 0.95f }, 0.05f).second;
 		ui_hp_frame->GetOwner()->render_queue = RENDER_QUEUE_OVERLAY + 1;
 	}
 	// 体力ゲージを生成していなかったら
 	if (!ui_hp_gauge)
 	{
 		// 体力ゲージを生成する
-		ui_hp_gauge = engine->CreateUIObject<UILayout>("Res/boss_hp_gauge.dds", { -0.98f, 0.95f }, 0.05f).second;
+		ui_hp_gauge = engine->CreateUIObject<UILayout>("Res/UI_hp_gauge.dds", { -0.98f, 0.95f }, 0.05f).second;
 		ui_hp_gauge->GetOwner()->materials[0]->baseColor = { 0.0f, 1.0f, 0.0f, 1 };
 	}
 	// 体力ゲージを表示する

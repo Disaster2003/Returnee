@@ -4,7 +4,7 @@
 #ifndef WEAPONATTACKCOLLIDER_H_INCLUDED
 #define WEAPONATTACKCOLLIDER_H_INCLUDED
 #include "../AttackCollider.h"
-#include "../../Effect/BloodParticle.h"
+#include "../../Effect/PlayerActionSuccessParticle.h"
 
 /// <summary>
 /// 対敵攻撃用のコライダー制御
@@ -37,7 +37,7 @@ public:
     template<typename T, typename U>
     void DealDamage(const T player, const U enemy)
     {
-        // 攻撃状態なら
+        // ヒット!!
         if (player->GetIsAttacking())
         {
             // 攻撃状態解除
@@ -46,17 +46,19 @@ public:
             // ダメージを与える
             enemy->TakeDamage(damage, player->GetOwner());
 
-            // 血しぶき
+            // 氷の血しぶき
             auto player_owner = player->GetOwner();
             for (int i = 0; i < 5; ++i)
             {
                 // 正面を決定する
                 const vec3 dirFront = { sin(player_owner->rotation.y), 0, cos(player_owner->rotation.y) };
 
-                // 発動を表す煙を表示する
+                // 発動を表すエフェクトを表示する
                 vec3 position_effect = player_owner->position - dirFront;
                 auto hitEffect = enemy->GetOwner()->GetEngine()->Create<GameObject>("hit effect", position_effect);
-                hitEffect->AddComponent<BloodParticle>();
+                hitEffect->AddComponent<PlayerActionSuccessParticle>();
+                hitEffect->materials[0]->texBaseColor = GetOwner()->GetEngine()->GetTexture("Res/particle_damage.tga");
+                hitEffect->materials[0]->texEmission = GetOwner()->GetEngine()->GetTexture("Res/particle_damage.tga");
             }
         }
     }

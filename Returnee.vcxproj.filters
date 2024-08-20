@@ -206,7 +206,7 @@
     <ClInclude Include="Src\Engine\VertexArrayObject.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Effect\BloodParticle.h">
+    <ClInclude Include="Src\Effect\PlayerActionSuccessParticle.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="Src\Effect\MagicMissileParticle.h">
@@ -263,7 +263,7 @@
     <ClInclude Include="Src\MikkTSpace\mikktspace.h">
       <Filter>ソース ファイル\MikkTSpace</Filter>
     </ClInclude>
-    <ClInclude Include="Src\Effect\SwordSwingParticle.h">
+    <ClInclude Include="Src\Effect\SwordSwingEffect.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

@@ -55,36 +55,34 @@ public:
         auto engine = owner->GetEngine();
         auto player = owner->GetComponent<PlayerComponent>();
 
-        // プレイヤーがゲームプレイ中でなければ
+        // プレイ中じゃなければ、ガイドの破棄
         if (player->GetStatePlayer() != PlayerComponent::STATE_PLAYER::ALIVE)
-            // 自身を破棄する
             ui_guide_action->GetOwner()->Destroy();
-        // ボス部屋に到着したら
         else if (isArrivedBossRoom)
         {
             // 操作ガイドを変更していたら
             if (ui_guide_action)
             {
                 // 変更後3.0秒は点滅させる
-                GuideFlashing(ui_guide_action, deltaTime);
+                GuideFlashing(deltaTime, ui_guide_action);
 
-                // 何もしない
+                // 以降、何もしない
                 return;
             }
-            // 基本操作ガイドを破棄する
+            // 基本操作ガイドの破棄
             ui_guide_control->GetOwner()->Destroy();
-            // 戦闘操作ガイドが生成されていなかったら
+            // 戦闘操作ガイドの生成
             if (!ui_guide_action)
-                // 戦闘操作ガイドを生成する
-                ui_guide_action = engine->CreateUIObject<UILayout>("Res/guide_action.dds", { -1.40f, 0.00f }, 0.60f).second;
+                ui_guide_action = engine->CreateUIObject<UILayout>("Res/UI_guide_action.dds", { -1.40f, 0.00f }, 0.60f).second;
         }
-        // 基本操作ガイドが生成されていなかったら
+        // 基本操作ガイドの生成
         else if (!ui_guide_control)
-            // 基本操作ガイドを生成する
-            ui_guide_control = engine->CreateUIObject<UILayout>("Res/guide_base.dds", { -1.40f, 0.00f }, 0.60f).second;
+            ui_guide_control = engine->CreateUIObject<UILayout>("Res/UI_guide_control.dds", { -1.40f, 0.00f }, 0.60f).second;
     }
 
-    // ボス部屋に到着したことを設定する
+    /// <summary>
+    /// ボス部屋に到着したことを設定する
+    /// </summary>
     inline void SetIsArrivedBossRoom() { isArrivedBossRoom = true; }
 
     /// <summary>
@@ -94,8 +92,8 @@ public:
     /// <param name="deltaTime">前回の更新からの経過時間(秒)</param>
     void GuideFlashing
     (
-        std::shared_ptr<UILayout> uiGuide,
-        float deltaTime
+        float _deltaTime,
+        std::shared_ptr<UILayout> _ui_guide
     )
     {
         // 3回点滅したら終了
@@ -105,13 +103,13 @@ public:
         // 小数点以下が0.5秒以上の場合
         if (fmod(timer, 1.0f) > 0.5f)
             // 表示する
-            uiGuide->position_base.y = 0;
+            _ui_guide->position_base.y = 0;
         else
             // 非表示にする
-            uiGuide->position_base.y = 10;
+            _ui_guide->position_base.y = 10;
 
         // ガイドの変更した後、時間計測
-        timer += deltaTime;
+        timer += _deltaTime;
     }
 
 private:
@@ -126,7 +124,7 @@ private:
 /// <summary>
 /// 目標ガイド
 /// </summary>
-class GoalGuide
+class TaskGuide
     : public Component
 {
 public:
@@ -138,69 +136,60 @@ public:
     {
         auto owner = GetOwner();
         auto engine = owner->GetEngine();
-        // プレイヤーコンポーネントを取得する
         auto player = owner->GetComponent<PlayerComponent>();
 
-        // プレイヤーがゲームプレイ中でなければ
+        // プレイ中じゃなければ、ガイドの破棄
         if (player->GetStatePlayer() != PlayerComponent::STATE_PLAYER::ALIVE)
         {
-            
-            if (state_guide == 2)
-                // ゴールに触れたら、自身を破棄する
+
+            if (state_guide == GET_TREASURE)
                 ui_guide_get_treasure->GetOwner()->Destroy();
-            else if(state_guide == 1)
-                // ゲームオーバーなら、自身を破棄する
+            else if (state_guide == BOSS_BATTLE)
                 ui_guide_boss_battle->GetOwner()->Destroy();
-            else if(state_guide == 0)
-                // ゲームオーバーなら、自身を破棄する
+            else if (state_guide == PLAYER_FORWARD)
                 ui_guide_player_forward->GetOwner()->Destroy();
         }
-        // ボスを倒したら
-        else if (state_guide == 2)
+        else if (state_guide == GET_TREASURE)
         {
             // 目標ガイドを変更していたら
             if (ui_guide_get_treasure)
             {
                 // 変更後3.0秒は点滅させる
-                GuideFlashing(ui_guide_get_treasure, deltaTime);
+                GuideFlashing(deltaTime, ui_guide_get_treasure);
 
-                // 何もしない
+                // 以降、何もしない
                 return;
             }
-            // ボス討伐目標ガイドを破棄する
+            // ボス討伐目標ガイドの破棄
             ui_guide_boss_battle->GetOwner()->Destroy();
-            // ゴール間近目標ガイドが生成されていなかったら
+            // ゴール間近目標ガイドの生成
             if (!ui_guide_get_treasure)
-                // ゴール間近目標ガイドを生成する
-                ui_guide_get_treasure = engine->CreateUIObject<UILayout>("Res/goal_get_treasure.dds", { 1.10f, 0.80f }, 0.20f).second;
+                ui_guide_get_treasure = engine->CreateUIObject<UILayout>("Res/UI_task_get_treasure.dds", { 1.10f, 0.80f }, 0.20f).second;
         }
-        // ボス部屋に到着したら
-        else if (state_guide == 1)
+        else if (state_guide == BOSS_BATTLE)
         {
             // 目標ガイドを変更していたら
             if (ui_guide_boss_battle)
             {
                 // 変更後3.0秒は点滅させる
-                GuideFlashing(ui_guide_boss_battle, deltaTime);
+                GuideFlashing(deltaTime, ui_guide_boss_battle);
 
-                // 何もしない
+                // 以降、何もしない
                 return;
             }
-            // 初期目標ガイドを破棄する
+            // 初期目標ガイドの破棄
             ui_guide_player_forward->GetOwner()->Destroy();
-            // ボス討伐目標ガイドが生成されていなかったら
+            // ボス討伐目標ガイドの生成
             if (!ui_guide_boss_battle)
-                // ボス討伐目標ガイドを生成する
-                ui_guide_boss_battle = engine->CreateUIObject<UILayout>("Res/goal_kill_dragon.dds", { 1.10f, 0.80f }, 0.20f).second;
+                ui_guide_boss_battle = engine->CreateUIObject<UILayout>("Res/UI_task_kill_dragon.dds", { 1.10f, 0.80f }, 0.20f).second;
         }
-        // ゲームが始まったら
+        // 初期目標ガイドの生成
         else if (!ui_guide_player_forward)
-                // 初期目標ガイドを生成する
-                ui_guide_player_forward = engine->CreateUIObject<UILayout>("Res/goal_go_straight.dds", { 1.10f, 0.80f }, 0.20f).second;
+            ui_guide_player_forward = engine->CreateUIObject<UILayout>("Res/UI_task_go_straight.dds", { 1.10f, 0.80f }, 0.20f).second;
     }
 
     // 次の段階へ設定する
-    inline void SetGuideState() { state_guide = static_cast<STATE_GUIDE>(static_cast<int>(state_guide) + 1); }
+    inline void SetGuideState() { state_guide = static_cast<STATE_GUIDE>(state_guide + 1); }
 
     /// <summary>
     /// ガイドの疑似点滅
@@ -209,8 +198,8 @@ public:
     /// <param name="deltaTime">前回の更新からの経過時間(秒)</param>
     void GuideFlashing
     (
-        std::shared_ptr<UILayout> uiGuide,
-        float deltaTime
+        float _deltaTime,
+        std::shared_ptr<UILayout> _ui_guide
     )
     {
         // 3回点滅したら終了
@@ -220,16 +209,17 @@ public:
         // 小数点以下が0.5秒以上の場合
         if (fmod(timer, 1.0f) > 0.5f)
             // 表示する
-            uiGuide->position_base.y = 0.80f;
+            _ui_guide->position_base.y = 0.80f;
         else
             // 非表示にする
-            uiGuide->position_base.y = 10;
+            _ui_guide->position_base.y = 10;
 
         // ガイドの変更した後、時間計測
-        timer += deltaTime;
+        timer += _deltaTime;
     }
 
 private:
+    // ガイドの状態
     enum STATE_GUIDE
     {
         PLAYER_FORWARD,
@@ -258,22 +248,25 @@ public:
     /// <param name="deltaTime">前回の更新からの経過時間(秒)</param>
     virtual void Update(float deltaTime) override
     {
-        if (!doClosing || isClosed || !enter)
+        if (!doClosing || !enter)
             return;
         
         // 岩石を上げる
         enter->position.y += 8 * deltaTime;
         float vol = EasyAudio::GetVolume(AudioPlayer::bgm);
         EasyAudio::SetVolume(AudioPlayer::bgm, std::max(vol - deltaTime, 0.0f));
+
+        // 岩石を上げきったら、ボス戦開始
         if (enter->position.y >= 0.5f)
         {
-            /* 完了 */
-            // BossBGMを再生する
+            // ボス戦のBGMを再生する
             EasyAudio::Stop(AudioPlayer::bgm);
-            EasyAudio::Play(AudioPlayer::bgm, BGM::boss, 1, true);
-            enter->position.y = 0.5f;
-            isClosed = true;
-            guide_goal->SetGuideState();
+            EasyAudio::Play(AudioPlayer::bgm, BGM::vsBoss, 1, true);
+
+            // 目標ガイドの変更
+            taskGuide->SetGuideState();
+
+            // トリガーの破棄
             GetOwner()->Destroy();
         }
     }
@@ -289,24 +282,27 @@ public:
         const ComponentPtr& other
     ) override
     {
-        // 岩が動いてない状態かつ、プレイヤーに触れたら
+        // 岩の起動
         if (!doClosing && other->GetOwner()->name == "player")
         {
-            // 岩の起動
+            // 岩の動く効果音を再生する
             EasyAudio::PlayOneShot(SE::rock_close);
+
+            // 起動
             doClosing = true;
+
+            // ボスの索敵距離をボスエリア全体に
             if (boss && boss->GetOwner())
                 boss->SetSearchDistance(30);
         }
     }
 
-    GameObjectPtr enter;                   // 入り口に埋まってる岩
-    std::shared_ptr<GoalGuide> guide_goal; // 目標ガイド
-    std::shared_ptr<Dragon> boss;          // ボス
+    GameObjectPtr enter;                  // 入り口に埋まってる岩
+    std::shared_ptr<TaskGuide> taskGuide; // 目標ガイド
+    std::shared_ptr<Dragon> boss;         // ボス
 
 private:
     bool doClosing = false; // 岩をtrue = 動かす、false = 動かさない
-    bool isClosed = false;  // 岩で入り口をtrue = 封鎖、false = 通行
 };
 
 /// <summary>
@@ -327,15 +323,17 @@ public:
         const ComponentPtr& other
     ) override
     {
-        // 岩が動いてない状態かつ、プレイヤーに触れたら
+        // 操作ガイドの変更
         if (other->GetOwner()->name == "player")
         {
-            guide_control->SetIsArrivedBossRoom();
+            controlGuide->SetIsArrivedBossRoom();
+
+            // トリガーの破棄
             GetOwner()->Destroy();
         }
     }
 
-    std::shared_ptr<ControlGuide> guide_control; // 操作ガイド
+    std::shared_ptr<ControlGuide> controlGuide; // 操作ガイド
 };
 
 /// <summary>
@@ -350,21 +348,15 @@ public:
     /// </summary>
     virtual void OnDestroy() override
     {
-        while (1)
-        {
-            // 岩石を下ろす
-            exit->position.y -= 1.0f;
-            if (exit->position.y <= -4.0f)
-            {
-                exit->position.y = -4.0f;
-                guide_goal->SetGuideState();
-                break;
-            }
-        }
+        // 岩石を下ろす
+        exit->position.y = -4.0f;
+
+        // 目標ガイドの変更
+        taskGuide->SetGuideState();
     }
 
-    GameObjectPtr exit;
-    std::shared_ptr<GoalGuide> guide_goal;
+    GameObjectPtr exit;                   // 出口を塞いでいる岩
+    std::shared_ptr<TaskGuide> taskGuide; // 目標ガイド
 };
 
 /// <summary>
@@ -374,17 +366,16 @@ public:
 /// <returns>true : 初期化成功、false : 初期化失敗</returns>
 bool ExplorationScene::Initialize(Engine& engine)
 {
-    // PlayBGMを再生する
+    // プレイBGMを再生する
     EasyAudio::Stop(AudioPlayer::bgm);
     EasyAudio::Play(AudioPlayer::bgm, BGM::play, 1, true);
 
-    // ゲームオブジェクト配置ファイルを読み込む
+    // ゲームオブジェクト配置ファイルの読み込み
     Engine::FilepathMap filepathMap;
     filepathMap["Floor"] = "Res/MeshData/a_piece_of_nature/Floor.obj";
     filepathMap["cliff"] = "Res/MeshData/free_rocks/Cliff.obj";
     filepathMap["Enter"] = "Res/MeshData/free_rocks/Wall.obj";
     filepathMap["Exit"] = "Res/MeshData/free_rocks/Wall.obj";
-    filepathMap["Chest"] = "Res/MeshData/a_piece_of_nature/Chest.obj";
     filepathMap["sticker_punch"] = "Res/MeshData/sticker/punch.obj";
     filepathMap["sticker_magic"] = "Res/MeshData/sticker/magic.obj";
     filepathMap["sticker_arrow_down"] = "Res/MeshData/sticker/arrow_down.obj";
@@ -392,17 +383,17 @@ bool ExplorationScene::Initialize(Engine& engine)
     filepathMap["sticker_dragon_reverse"] = "Res/MeshData/sticker/dragon_reverse.obj";
     auto list = engine.LoadGameObjectMap("Res/GameObjectMap.json", filepathMap);
 
-    // プレイヤーを配置する
+    // プレイヤーの配置
     auto player = engine.Create<GameObject>("player", { 0, 1.5f, 0 });
     playerComponent = player->AddComponent<PlayerComponent>();
     player->AddComponent<FirstPersonCamera>();
     player->rotation.y = radians(180);
 
-    // スカイスフィアを設定する
+    // スカイスフィアの設定
     material_skysphere = std::make_shared<MATERIAL>();
     material_skysphere->texBaseColor = engine.GetTexture("Res/MeshData/sky_sphere/sky.dds");
 
-    // 環境キューブマップを設定する
+    // 環境キューブマップの設定
     static const char* const cubemapFilenames[6] =
     {
         "Res/cubemap/px.dds",
@@ -1160,15 +1151,15 @@ bool ExplorationScene::Initialize(Engine& engine)
 
     for (auto& go : list)
     {
-        // Dragonを配置する
+        // Dragonの配置
         if (strcmp("Dragon", go->name.c_str()) == 0)
         {
-            // メッシュを読み込む
+            // メッシュの読み込み
             go->renderer = std::make_shared<SkeletalMeshRenderer>();
             go->renderer->SetMesh(
                 engine.GetSkeletalMesh("Res/MeshData/free_rocks/Dragon.obj"));
 
-            // アニメーションを設定する
+            // アニメーションの設定
             auto a = go->AddComponent<Animator>();
             a->AddClip("wait", clipDragonWait);
             a->AddClip("walk", clipDragonWalk);
@@ -1179,13 +1170,13 @@ bool ExplorationScene::Initialize(Engine& engine)
             a->AddClip("dead", clipDragonDead);
             a->Play("wait");
 
-            // ドラゴンのコンポーネントを設定する
+            // ドラゴンの初期設定
             auto enemy = go->AddComponent<Dragon>();
             enemy->SetAnimator(a);
             enemy->SetTarget(player);
             go->AddComponent<GoalWay>();
 
-            // 霧コンポーネントを設定する
+            // 霧コンポーネントの設定
             auto mist_generator = engine.Create<GameObject>("mist generator", { 0, 1, 80 });
             auto mist_generatorComponent = mist_generator->AddComponent<MistGenerator>();
             mist_generatorComponent->range = { 15,15 };
@@ -1193,15 +1184,15 @@ bool ExplorationScene::Initialize(Engine& engine)
 
             boss = enemy;
         }
-        // OrcShamanFighterを配置する
+        // OrcShamanFighterの配置
         if (strcmp("OrcShamanFighter", go->name.c_str()) == 0)
         {
-            // メッシュを読み込む
+            // メッシュの読み込み
             go->renderer = std::make_shared<SkeletalMeshRenderer>();
             go->renderer->SetMesh(
-                engine.GetSkeletalMesh("Res/MeshData/orcshaman/orcshaman_fighter.obj"));
+                engine.GetSkeletalMesh("Res/MeshData/orcshaman/Fighter.obj"));
 
-            // アニメーションを設定する
+            // アニメーションの設定
             auto a = go->AddComponent<Animator>();
             a->AddClip("wait", clipOrcWait);
             a->AddClip("walk", clipOrcWalk);
@@ -1211,22 +1202,22 @@ bool ExplorationScene::Initialize(Engine& engine)
             a->AddClip("down.1", clipOrcDown1);
             a->Play("wait");
 
-            // オークのコンポーネントを設定する
+            // OrcShamanFighterの初期設定
             auto enemy = go->AddComponent<Orc>();
             enemy->SetAnimator(a);
             enemy->SetTarget(player);
             enemy->SetAttackDistance(3);
             enemy->SetJob(Orc::JOB::FIGHTER);
         }
-        // OrcShamanMagicianを配置する
+        // OrcShamanMagicianの配置
         if (strcmp("OrcShamanMagician", go->name.c_str()) == 0)
         {
-            // メッシュを読み込む
+            // メッシュの読み込み
             go->renderer = std::make_shared<SkeletalMeshRenderer>();
             go->renderer->SetMesh(
-                engine.GetSkeletalMesh("Res/MeshData/orcshaman/orcshaman_magician.obj"));
+                engine.GetSkeletalMesh("Res/MeshData/orcshaman/Magician.obj"));
 
-            // アニメーションを設定する
+            // アニメーションの設定
             auto a = go->AddComponent<Animator>();
             a->AddClip("wait", clipOrcWait);
             a->AddClip("walk", clipOrcWalk);
@@ -1235,57 +1226,63 @@ bool ExplorationScene::Initialize(Engine& engine)
             a->AddClip("down.1", clipOrcDown1);
             a->Play("wait");
 
-            // オークのコンポーネントを設定する
+            // OrcShamanMagicianの初期設定
             auto enemy = go->AddComponent<Orc>();
             enemy->SetAnimator(a);
             enemy->SetTarget(player);
             enemy->SetAttackDistance(5);
             enemy->SetJob(Orc::JOB::MAGICIAN);
         }
-        // ゴール判定オブジェクトを配置する
+        // ゴール判定オブジェクトの配置
         else if (strcmp("Chest", go->name.c_str()) == 0)
+        {
+            // メッシュの読み込み
+            go->staticMesh =
+                engine.GetStaticMesh("Res/MeshData/a_piece_of_nature/Chest.obj");
             go->AddComponent<GoalEvent>();
-        // 雑魚部屋侵入検知器を配置する
+        }
+        // 雑魚部屋侵入検知器の配置
         else if (go->name == "EnemyTrigger")
             enemyTrigger = go;
-        // ボス部屋侵入検知器を配置する
+        // ボス部屋侵入検知器の配置
         else if (go->name == "BossTrigger")
             bossTrigger = go;
-        // ボス部屋の入り口を封鎖するための岩を配置する
+        // ボス部屋の入り口を封鎖するための岩の配置
         else if (go->name == "Enter")
             enter = go;
-        // ボス部屋の出口を封鎖するための岩を配置する
+        // ボス部屋の出口を封鎖するための岩の配置
         else if (go->name == "Exit")
             exit = go;
     }
 
+    // 雑魚部屋侵入検知器の初期設定
     if (enemyTrigger)
     {
-        // 雑魚敵エリアに入った判定するトリガーを設定する
         auto box = enemyTrigger->GetComponent<BoxCollider>();
         if (box)
             box->isTrigger = true;
         auto a = enemyTrigger->AddComponent<EnemyTrigger>();
-        a->guide_control = player->AddComponent<ControlGuide>();
+        a->controlGuide = player->AddComponent<ControlGuide>();
     }
+    // ボス部屋侵入検知器の初期設定
     if (bossTrigger && enter)
     {
-        // ボスエリアに入った判定するトリガーを設定する
         auto box = bossTrigger->GetComponent<BoxCollider>();
         if (box)
             box->isTrigger = true;
         auto a = bossTrigger->AddComponent<BossTrigger>();
         a->enter = enter;
-        a->guide_goal = player->AddComponent<GoalGuide>();
+        a->taskGuide = player->AddComponent<TaskGuide>();
         a->boss = boss;
     }
+    // 出口とボスを連携
     if (exit)
     {
-        // 出口とボスを連携させる
         boss->GetOwner()->GetComponent<GoalWay>()->exit = exit;
-        boss->GetOwner()->GetComponent<GoalWay>()->guide_goal = player->GetComponent<GoalGuide>();
+        boss->GetOwner()->GetComponent<GoalWay>()->taskGuide = player->GetComponent<TaskGuide>();
     }
 
+    // 初期化成功
     return true;
 }
 
@@ -1300,14 +1297,14 @@ void ExplorationScene::Update
     float deltaTime
 )
 {
-    // プレイヤーが死んでいたら、ゲームオーバー画面を表示して、状態をgameOverに変更
+    // ゲームオーバー画面に切り替える
     if (playerComponent->GetStatePlayer() == PlayerComponent::STATE_PLAYER::DEAD)
     {
-        // ゲームオーバー画像を表示
-        engine.CreateUIObject<UILayout>("Res/game_over.dds", { 0,0 }, 0.25f);
+        // ゲームオーバーロゴの生成
+        engine.CreateUIObject<UILayout>("Res/UI_logo_game_over.dds", { 0,0 }, 0.25f);
 
-        // タイトル画面に戻るボタンを表示
-        auto button = engine.CreateUIObject<UIButton>("Res/return_button.dds", { 0,-0.5f }, 0.1f);
+        // タイトル画面に戻るボタンの生成
+        auto button = engine.CreateUIObject<UIButton>("Res/button_return_title.dds", { 0,-0.5f }, 0.1f);
         button.second->onClick.push_back
         (
             [](UIButton* button)
@@ -1320,7 +1317,7 @@ void ExplorationScene::Update
 }
 
 /// <summary>
-/// シーンを終了する
+/// プレイ画面を終了する
 /// </summary>
 /// <param name="engine">ゲームエンジン</param>
 void ExplorationScene::Finalize(Engine& engine)

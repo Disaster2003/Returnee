@@ -6,7 +6,7 @@
 #include "../Engine/Billboard.h"
 
 /// <summary>
-/// 粒子
+/// パーティクルの基底クラス
 /// </summary>
 class Particle
     : public Component
@@ -51,7 +51,9 @@ public:
         life_span -= deltaTime; // 生存期間を減らす
     }
 
-    // 寿命を取得する
+    /// <summary>
+    /// 寿命を取得する
+    /// </summary>
     float GetLifespan() const { return life_span; }
 
 private:

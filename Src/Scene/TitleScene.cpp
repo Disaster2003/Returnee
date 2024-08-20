@@ -14,7 +14,7 @@
 /// <return>true = 初期化成功、false = 初期化失敗</return>
 bool TitleScene::Initialize(Engine& engine)
 {
-	// ライトを配置
+	// ライトの配置
 	auto lightObject =
 		engine.Create<GameObject>
 		(
@@ -26,13 +26,14 @@ bool TitleScene::Initialize(Engine& engine)
 	light->intensity = 10;
 	light->radius = 5;
 
-	title_bg = engine.CreateUIObject<UILayout>("Res/title_bg.dds", { 0,0 }, 1.3f).second;
-	title_bg->GetOwner()->materials[0]->baseColor = { 0, 0, 0, 1 };
-	title_logo = engine.CreateUIObject<UILayout>("Res/title_logo.dds", { 0,0.3f }, 0.3f).second;
-	title_logo->GetOwner()->materials[0]->baseColor = { 0, 0, 0, 1 };
-	auto startButton = engine.CreateUIObject<UIButton>("Res/start_button.dds", { 0,-0.6f }, 0.1f);
+	// タイトルロゴと背景、プレイ画面へ移すボタンの生成
+	ui_background_title = engine.CreateUIObject<UILayout>("Res/UI_background_title.dds", { 0,0 }, 1.3f).second;
+	ui_background_title->GetOwner()->materials[0]->baseColor = { 0, 0, 0, 1 };
+	ui_logo_title = engine.CreateUIObject<UILayout>("Res/UI_logo_title.dds", { 0,0.3f }, 0.3f).second;
+	ui_logo_title->GetOwner()->materials[0]->baseColor = { 0, 0, 0, 1 };
+	auto startButton = engine.CreateUIObject<UIButton>("Res/button_start_play.dds", { 0,-0.6f }, 0.1f);
 
-	// ボタンが押されたらメインゲームシーンに切り替えるラムダ式を設定
+	// ボタンが押されたらメインゲームシーンに切り替えるラムダ式の設定
 	startButton.second->onClick.push_back
 	(
 		[this](UIButton* button)
@@ -43,7 +44,7 @@ bool TitleScene::Initialize(Engine& engine)
 		}
 	);
 
-	// フェードアウト用UIオブジェクト
+	// フェードアウト用UIオブジェクトの生成
 	auto fade = engine.CreateUIObject<UILayout>("Res/white.tga", { 0,0 }, 1);
 	obj_fade = fade.first;
 	// 画面全体を覆うサイズに設定
@@ -70,35 +71,35 @@ void TitleScene::Update
 	float deltaTime
 )
 {
+	// タイトルロゴをフェードイン
 	if (!isFadedIn)
 	{
-		// タイトルロゴをフェードインさせる
-		float c = title_logo->GetOwner()->materials[0]->baseColor.x;
+		float c = ui_logo_title->GetOwner()->materials[0]->baseColor.x;
 		c = std::min(c + deltaTime * 0.5f, 1.0f);
-		title_logo->GetOwner()->materials[0]->baseColor = { c, c, c, 1 };
+		ui_logo_title->GetOwner()->materials[0]->baseColor = { c, c, c, 1 };
 		if (c >= 1)
 		{
 			c = 1;
 			isFadedIn = true;
 		}
 	}
+	// 背景をフェードイン
 	else
 	{
-		// タイトル背景をフェードインさせる
-		float c = title_bg->GetOwner()->materials[0]->baseColor.x;
+		float c = ui_background_title->GetOwner()->materials[0]->baseColor.x;
 		c = std::min(c + deltaTime * 0.5f, 1.0f);
-		title_bg->GetOwner()->materials[0]->baseColor = { c, c, c, 1 };
+		ui_background_title->GetOwner()->materials[0]->baseColor = { c, c, c, 1 };
 		if (c >= 1)
 			c = 1;
 	}
 
+	// 徐々にフェードアウト
 	if (time_fade > 0)
 	{
-		// タイマーに合わせて徐々にフェードアウトさせる
 		time_fade -= deltaTime;
 		obj_fade->color[3] = 1 - time_fade;
 
-		// タイマーが0以下になったらメインゲームシーンに切り替える
+		// フェードアウトが終わったら、プレイ画面に切り替える
 		if (time_fade <= 0)
 			engine.SetNextScene<ExplorationScene>();
 	}//if fadeTimer

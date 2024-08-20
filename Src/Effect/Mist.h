@@ -69,7 +69,7 @@ public:
 		// –¶ƒ}ƒeƒŠƒAƒ‹‚ğì¬‚·‚é
 		mistMaterial = CloneMaterialList(
 			GetOwner()->GetEngine()->GetStaticMesh("plane_xy"));
-		mistMaterial[0]->texBaseColor = GetOwner()->GetEngine()->GetTexture("Res/mist.tga");
+		mistMaterial[0]->texBaseColor = GetOwner()->GetEngine()->GetTexture("Res/effect_mist.tga");
 	}
 
 	/// <summary>

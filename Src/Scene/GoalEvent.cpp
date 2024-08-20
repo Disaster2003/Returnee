@@ -16,10 +16,11 @@ void GoalEvent::Awake()
 {
 	auto owner = GetOwner();
 
-	// コンポーネントを設定する
+	// コンポーネントの設定
 	auto collider = owner->AddComponent<SphereCollider>();
-	collider->sphere.radius = 0.5f;
+	collider->sphere.radius = 1.0f;
 	collider->sphere.position.y = 0.5f + 0.9f;
+	collider->isStatic = true;
 }
 
 /// <summary>
@@ -31,10 +32,9 @@ void GoalEvent::Update(float deltaTime)
 	auto owner = GetOwner();
 	auto engine = owner->GetEngine();
 
-	// ゴールに触れたら
+	// ゴールに触れたら、キラキラしたパーティクルを生成し続ける
 	if (isTriggered)
 	{
-		// パーティクルを生成する
 		time_particle += deltaTime;
 		if (time_particle >= 0.1f)
 		{
@@ -44,12 +44,12 @@ void GoalEvent::Update(float deltaTime)
 		}
 	}
 
-	// タイマーに合わせて徐々にフェードアウトさせて、
-	// タイマーが0以下になったらメインゲームシーンに切り替える
+	// 徐々にフェードアウト
 	if (time_fade > 0)
 	{
 		time_fade -= deltaTime;
 		obj_fade->color[3] = 1 - time_fade;
+		// フェードアウトが終わったら、タイトル画面に切り替える
 		if (time_fade <= 0)
 			engine->SetNextScene<TitleScene>();
 	} // if fadeTimer
@@ -72,15 +72,15 @@ void GoalEvent::OnCollision
 
 	isTriggered = true; // 状態を「衝突済み」にする
 
-	// メッセージオブジェクトを登場させる
+	// メッセージオブジェクトの生成
 	Engine* engine = GetOwner()->GetEngine();
-	engine->CreateUIObject<UILayout>("Res/goal_text.dds", { 0,0 }, 0.1f);
+	engine->CreateUIObject<UILayout>("Res/UI_logo_game_clear.dds", { 0,0 }, 0.1f);
 
-	// 戻るボタンを追加する
+	// 戻るボタンの生成
 	auto button =
 		engine->CreateUIObject<UIButton>
 		(
-			"Res/return_button.dds",
+			"Res/button_return_title.dds",
 			{ 0,-0.5f },
 			0.1f
 		);
@@ -94,7 +94,7 @@ void GoalEvent::OnCollision
 		}
 	);
 
-	// フェードアウト用の画像を追加する
+	// フェードアウト用画像の生成
 	auto fade =
 		engine->CreateUIObject<UILayout>
 		(
@@ -107,8 +107,9 @@ void GoalEvent::OnCollision
 	obj_fade->scale = { fbSize.x / fbSize.y,1,1 };
 	std::fill_n(&obj_fade->color.x, 4, 0.0f);
 
-	// GameClearBGMを再生する
+	// ゲームクリアBGM/SEを再生
 	EasyAudio::Stop(AudioPlayer::bgm);
+	EasyAudio::Stop(AudioPlayer::run);
 	EasyAudio::Play(AudioPlayer::bgm, BGM::game_clear, 1, true);
 	EasyAudio::PlayOneShot(SE::goal);
 }

@@ -26,9 +26,9 @@ private:
 	// ゴール演出における衝突イベント
 	virtual void OnCollision(const ComponentPtr& self, const ComponentPtr& other)override;
 	
-	GameObjectPtr obj_fade;	  // フェードアウト用の変数
-	float time_fade = 0.0f,	  // フェードアウトまでの時間
-		time_particle = 0.0f; // パーティクル生成までの時間
+	GameObjectPtr obj_fade;	// フェードアウトオブジェクト
+	float time_fade = 0,	// フェードアウトまでの時間
+		time_particle = 0;	// パーティクル生成までの時間
 
 	bool isTriggered = false; // ゴール判定がtrue = 起動、false = 停止
 };

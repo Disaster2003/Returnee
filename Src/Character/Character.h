@@ -21,9 +21,14 @@ protected:
 		:hp(_hp)
 	{}
 
-	// 体力を取得する
+	/// <summary>
+	/// 体力を取得する
+	/// </summary>
 	int GetHp() const { return hp; }
-	// 体力を設定する
+	/// <summary>
+	/// 体力を設定する
+	/// </summary>
+	/// <param name="damage">ダメージ量</param>
 	void SetHp(int damage) { hp -= damage; }
 
 	// ダメージ量
@@ -34,7 +39,7 @@ protected:
 	};
 
 private:
-	int hp = 0;
+	int hp = 0; // 体力
 };
 
 #endif // !CHARACTER_H_INCLUDED

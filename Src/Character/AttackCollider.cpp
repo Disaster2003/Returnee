@@ -9,7 +9,7 @@
 /// </summary>
 void AttackCollider::Awake()
 {
-    // コライダーを設定する
+    // コライダーの設定
     collider = GetOwner()->AddComponent<SphereCollider>();
     collider->isTrigger = true;
     collider->isStatic = true;
@@ -32,14 +32,17 @@ void AttackCollider::Update(float deltaTime)
     {
     default:
     case STATE_ATTACK_COLLIDER::SLEEP:
+        // コライダー起動
         if (timer >= 0.3f)
             state = STATE_ATTACK_COLLIDER::COLLISION_ENABLE;
         break;
     case STATE_ATTACK_COLLIDER::COLLISION_ENABLE:
+        // コライダー停止
         if (timer >= 0.5f)
             state = STATE_ATTACK_COLLIDER::COLLISION_DISABLE;
         break;
     case STATE_ATTACK_COLLIDER::COLLISION_DISABLE:
+        // コライダーOff
         if (timer >= 0.6f)
             Deactivate();
         break;
@@ -56,6 +59,8 @@ void AttackCollider::Activate(float collider_sphere_radius)
     {
         state = STATE_ATTACK_COLLIDER::COLLISION_ENABLE;
         timer = 0;
+
+        // 攻撃範囲の設定
         collider->sphere.radius = collider_sphere_radius;
     }
 }

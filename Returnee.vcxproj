@@ -177,13 +177,13 @@
     <ClInclude Include="Src\Character\Enemy\Orc.h" />
     <ClInclude Include="Src\Character\Player\PlayerComponent.h" />
     <ClInclude Include="Src\Character\Player\WeaponAttackCollider.h" />
-    <ClInclude Include="Src\Effect\BloodParticle.h" />
+    <ClInclude Include="Src\Effect\PlayerActionSuccessParticle.h" />
     <ClInclude Include="Src\Effect\MagicMissileParticle.h" />
     <ClInclude Include="Src\Effect\Mist.h" />
     <ClInclude Include="Src\Effect\Particle.h" />
     <ClInclude Include="Src\Effect\Smoke.h" />
     <ClInclude Include="Src\Effect\Stardust.h" />
-    <ClInclude Include="Src\Effect\SwordSwingParticle.h" />
+    <ClInclude Include="Src\Effect\SwordSwingEffect.h" />
     <ClInclude Include="Src\Engine\AabbCollider.h" />
     <ClInclude Include="Src\Engine\Animation.h" />
     <ClInclude Include="Src\Engine\Billboard.h" />

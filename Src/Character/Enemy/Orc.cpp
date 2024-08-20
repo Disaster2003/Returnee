@@ -218,10 +218,10 @@ void Orc::StartAttackMagicMissile()
     const vec3 spawnPosition = owner->position + dirFront + spawnOffset;
     auto smoke = engine->Create<GameObject>("smoke", spawnPosition);
     smoke->AddComponent<Smoke>();
-    smoke->materials[0]->texBaseColor = engine->GetTexture("Res/magic_circle.tga");
-    smoke->materials[0]->texEmission = engine->GetTexture("Res/magic_circle.tga");
-    smoke->materials[0]->baseColor = { 1,1,0,1 };
-    smoke->materials[0]->emission = { 1,1,0 };
+    smoke->materials[0]->texBaseColor = engine->GetTexture("Res/effect_magic_circle.tga");
+    smoke->materials[0]->texEmission = engine->GetTexture("Res/effect_magic_circle.tga");
+    smoke->materials[0]->baseColor = { 2,2,0.2f,1 };
+    smoke->materials[0]->emission = { 2,2,0.2f };
 
     if (animator)
     {

@@ -142,7 +142,7 @@ private:
 	};
 
 	int index_random_walk_distance = 0,
-		attack_max = 2;			   // UŒ‚‰ñ”‚Ì§ŒÀ
+		attack_max = 2;				  // UŒ‚‰ñ”‚Ì§ŒÀ
 
 	float time_wait = 0.0f,			  // ‘Ò‹@‚ğŒp‘±‚·‚éŠÔ
 		time_walk = 0.0f,			  // ˆÚ“®‚ğŒp‘±‚·‚éŠÔ

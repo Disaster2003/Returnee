@@ -72,18 +72,16 @@ void Dragon::Update(float deltaTime)
     // 体力ゲージの表示・非表示、調整
     HpGauge(engine, deltaTime);
 
+    // 怒り状態にする
     if (!isAngry)
-        // 体力が1/3を切っていた場合
         if (Dragon::GetHp() <= HP_MAX / 3)
-            // 怒り状態にする
             isAngry = true;
 
-    // 怒りモードに入ったら
+    // 怒りモードに入ったら、疑似赤いスーパーサイヤ人
     if (isAngry)
         if (angry_effect_span <= 0)
         {
             angry_effect_span = 1.0f;
-            // 疑似赤いスーパーサイヤ人
             auto owner = GetOwner();
             const vec3 spawnPosition = { owner->position.x, owner->position.y + 2, owner->position.z };
             auto smoke = owner->GetEngine()->Create<GameObject>("smoke", spawnPosition);
@@ -798,14 +796,14 @@ void Dragon::HpGauge
         if (!ui_hp_frame)
         {
             // 体力ゲージのフレームを生成する
-            ui_hp_frame = engine->CreateUIObject<UILayout>("Res/boss_hp_frame.dds", { 0.00f, -0.80f }, 0.05f).second;
+            ui_hp_frame = engine->CreateUIObject<UILayout>("Res/UI_hp_frame.dds", { 0.00f, -0.80f }, 0.05f).second;
             ui_hp_frame->GetOwner()->render_queue = RENDER_QUEUE_OVERLAY + 1;
         }
         // 体力ゲージを生成していなかったら
         if (!ui_hp_gauge)
         {
             // 体力ゲージを生成する
-            ui_hp_gauge = engine->CreateUIObject<UILayout>("Res/boss_hp_gauge.dds", { 0.00f, -0.80f }, 0.05f).second;
+            ui_hp_gauge = engine->CreateUIObject<UILayout>("Res/UI_hp_gauge.dds", { 0.00f, -0.80f }, 0.05f).second;
             ui_hp_gauge->GetOwner()->materials[0]->baseColor = { 1.0f, 0.0f, 0.0f, 1 };
         }
 

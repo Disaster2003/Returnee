@@ -37,22 +37,28 @@ public:
 	// ダメージを受ける
 	void TakeDamage(int damage, GameObject* causer);
 
-	// プレイヤーの状態を表す列挙型
+	// プレイヤーの状態
 	enum class STATE_PLAYER
 	{
 		ALIVE, // 生きている
 		GOAL,  // ゴールした
 		DEAD,  // 死んでいる
 	};
-	// プレイヤーの状態を取得する
+	/// <summary>
+	/// プレイヤーの状態を取得する
+	/// </summary>
 	STATE_PLAYER GetStatePlayer() const { return state_player; }
 
-	// 攻撃状況を取得する
+	/// <summary>
+	/// 攻撃状況を取得する
+	/// </summary>
 	bool GetIsAttacking() const { return isAttacking; }
-	// 攻撃判定OFF
+	/// <summary>
+	/// 攻撃判定OFF
+	/// </summary>
 	void SetIsAttacking() { isAttacking = false; }
 
-	// 剣の状態を表す列挙型
+	// 剣の状態
 	enum class STATE_SWORD
 	{
 		IDLE,		  // 何もしていない
@@ -61,9 +67,13 @@ public:
 		THIRD_SWING,  // 三撃目
 		GUARD,		  // ガード中
 	};
-	// 剣の状態を取得する
+	/// <summary>
+	/// 剣の状態を取得する
+	/// </summary>
 	STATE_SWORD GetStateSword() const { return state_sword; }
-	// 剣を戻す
+	/// <summary>
+	/// 剣を戻す
+	/// </summary>
 	void SetAfterGuard() { isGuarded = true; }
 
 private:
@@ -77,8 +87,13 @@ private:
 	// 剣を振る
 	void SwordSwing(float deltaTime, float& rotation_hand);
 
+	void ClickCheck();
+
 	// 攻撃を初期化する
 	void AttackInitialize(STATE_SWORD next, STATE_SWORD finish);
+
+	// 斬撃跡を生成する
+	void CreateSwordSlashEffect(GameObject& _camera, int angle);
 
 	STATE_PLAYER state_player = STATE_PLAYER::ALIVE; // プレイヤーの状態
 	STATE_SWORD state_sword = STATE_SWORD::IDLE;	 // 剣の状態

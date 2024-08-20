@@ -15,7 +15,7 @@ void MagicMissile::Awake()
     auto engine = owner->GetEngine();
     owner->materials[0]->texBaseColor = engine->GetTexture("Res/particle_fire.tga");
     owner->materials[0]->baseColor = { 0, 0, 0, 1 }; // ライトの影響をなくす
-    owner->materials[0]->emission = { 2.0f, 1.0f, 0.5f };
+    owner->materials[0]->emission = { 2.0f, 1.0f, 0.2f };
     owner->scale = vec3(0.7f + static_cast<float>(rand() % 4) * 0.1f);
     owner->rotation.z = static_cast<float>(rand() % 10) * 0.63f;
 
@@ -59,17 +59,19 @@ void MagicMissile::OnCollision
 )
 {
     auto otherObject = other->GetOwner();
-    // プレイヤーと衝突したら
+    // ガード成功
     if (otherObject->name == "player")
     {
         auto engine = GetOwner()->GetEngine();
         const auto& player = otherObject->GetComponent<PlayerComponent>();
-        // ガードしていなかったら
         if (player->GetStateSword() == PlayerComponent::STATE_SWORD::GUARD)
         {
-            // ガード成功
+            // ガード音を再生する
             EasyAudio::PlayOneShot(SE::sword_guard);
+
+            // ガードの停止
             player->SetAfterGuard();
+
             auto player_owner = player->GetOwner();
             // ガードエフェクト
             for (int i = 0; i < 5; ++i)
@@ -77,12 +79,12 @@ void MagicMissile::OnCollision
                 // 正面を決定する
                 const vec3 dirFront = { sin(player_owner->rotation.y), 0, cos(player_owner->rotation.y) };
 
-                // 発動を表す煙を表示する
+                // ガードエフェクトの生成
                 vec3 position_effect = player_owner->position - dirFront;
                 auto effect_guard = engine->Create<GameObject>("guard effect", position_effect);
-                effect_guard->AddComponent<BloodParticle>();
-                effect_guard->materials[0]->texBaseColor = engine->GetTexture("Res/guard_effect.tga");
-                effect_guard->materials[0]->texEmission = engine->GetTexture("Res/guard_effect.tga");
+                effect_guard->AddComponent<PlayerActionSuccessParticle>();
+                effect_guard->materials[0]->texBaseColor = engine->GetTexture("Res/particle_guard.tga");
+                effect_guard->materials[0]->texEmission = engine->GetTexture("Res/particle_guard.tga");
             }
         }
         else
@@ -104,6 +106,7 @@ void MagicMissile::OnCollision
         return;
     else if (otherObject->name == "weapon")
         return;
+
     // 自身を破棄する
     GetOwner()->Destroy();
 }

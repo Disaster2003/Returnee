@@ -21,9 +21,9 @@ void WeaponAttackCollider::OnCollision
     if (WeaponAttackCollider::GetState() != STATE_ATTACK_COLLIDER::COLLISION_ENABLE)
         return;
 
-    auto targetObject = other->GetOwner();
-    int num_enemy = EnemyJudge(targetObject->name.c_str());
-    // •Ší‚ª“G‚ÉG‚ê‚½‚ç
+    // UŒ‚ˆ—
+    auto obj_target = other->GetOwner();
+    int num_enemy = EnemyJudge(obj_target->name.c_str());
     if (num_enemy)
     {
         // “G‚Éƒ_ƒ[ƒW‚ð—^‚¦‚é
@@ -31,10 +31,10 @@ void WeaponAttackCollider::OnCollision
         switch (num_enemy)
         {
         case 1:
-            DealDamage(player, targetObject->GetComponent<Dragon>());
+            DealDamage(player, obj_target->GetComponent<Dragon>());
             break;
         case 2:
-            DealDamage(player, targetObject->GetComponent<Orc>());
+            DealDamage(player, obj_target->GetComponent<Orc>());
             break;
         default:
             break;

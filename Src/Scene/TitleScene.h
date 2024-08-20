@@ -26,12 +26,11 @@ public:
 	virtual void Finalize(Engine& engine) override;
 
 private:
-	// フェードアウト用の変数
-	GameObjectPtr obj_fade;
-	float time_fade = 0;
+	GameObjectPtr obj_fade;	// フェードアウトオブジェクト
+	float time_fade = 0;	// フェードアウトまでの時間
 
-	std::shared_ptr<UILayout> title_logo; // タイトルロゴ
-	std::shared_ptr<UILayout> title_bg;	  // タイトル背景
+	std::shared_ptr<UILayout> ui_logo_title;	   // タイトルロゴ
+	std::shared_ptr<UILayout> ui_background_title; // タイトル背景
 
 	// フェードインtrue = した、false = していない
 	bool isFadedIn = false;

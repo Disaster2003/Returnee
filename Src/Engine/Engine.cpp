@@ -869,11 +869,12 @@ int Engine::Initialize()
 		skeleton.bones[3] = { { 0.4f, 1.65f,-0.2f }, { 1.6f, 1.65f,-0.2f }, 0, 0.5f }; // 左腕
 		skeleton.bones[4] = { {-0.2f, 0.90f,-0.2f }, {-0.2f, 0.00f,-0.2f }, 0, 0.3f }; // 右足
 		skeleton.bones[5] = { { 0.2f, 0.90f,-0.2f }, { 0.2f, 0.00f,-0.2f }, 0, 0.3f }; // 左足
-		meshBuffer->LoadOBJ("Res/MeshData/orcshaman/orcshaman_fighter.obj",skeleton);
-		meshBuffer->LoadOBJ("Res/MeshData/orcshaman/orcshaman_magician.obj",skeleton);
+		meshBuffer->LoadOBJ("Res/MeshData/orcshaman/Fighter.obj",skeleton);
+		meshBuffer->LoadOBJ("Res/MeshData/orcshaman/Magician.obj",skeleton);
 	}
 	meshBuffer->LoadOBJ("Res/MeshData/arm_and_hand/arm_and_hand_grab.obj");
 	meshBuffer->LoadOBJ("Res/MeshData/arm_and_hand/sword.obj");
+	meshBuffer->LoadOBJ("Res/MeshData/a_piece_of_nature/Chest.obj");
 
 	// ゲームオブジェクト配列の容量を予約する
 	gameObjects.reserve(1000);

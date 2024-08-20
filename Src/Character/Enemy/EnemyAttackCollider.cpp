@@ -21,16 +21,18 @@ void EnemyAttackCollider::OnCollision
 
     auto engine = GetOwner()->GetEngine();
     auto otherObject = other->GetOwner();
-    // プレイヤーと衝突したなら
+    // ガード成功
     if (otherObject->name == "player")
     {
         const auto& player = otherObject->GetComponent<PlayerComponent>();
-        // ガードしていたら
         if (player->GetStateSword() == PlayerComponent::STATE_SWORD::GUARD)
         {
-            // ガード成功
+            // ガード音を再生する
             EasyAudio::PlayOneShot(SE::sword_guard);
+
+            // ガードの停止
             player->SetAfterGuard();
+
             auto player_owner = player->GetOwner();
             // ガードエフェクト
             for (int i = 0; i < 5; ++i)
@@ -38,12 +40,12 @@ void EnemyAttackCollider::OnCollision
                 // 正面を決定する
                 const vec3 dirFront = { sin(player_owner->rotation.y), 0, cos(player_owner->rotation.y) };
 
-                // 発動を表す煙を表示する
+                // ガードエフェクトの生成
                 vec3 position_effect = player_owner->position - dirFront;
                 auto effect_guard = engine->Create<GameObject>("guard effect", position_effect);
-                effect_guard->AddComponent<BloodParticle>();
-                effect_guard->materials[0]->texBaseColor = engine->GetTexture("Res/guard_effect.tga");
-                effect_guard->materials[0]->texEmission = engine->GetTexture("Res/guard_effect.tga");
+                effect_guard->AddComponent<PlayerActionSuccessParticle>();
+                effect_guard->materials[0]->texBaseColor = engine->GetTexture("Res/particle_guard.tga");
+                effect_guard->materials[0]->texEmission = engine->GetTexture("Res/particle_guard.tga");
             }
         }
         else
