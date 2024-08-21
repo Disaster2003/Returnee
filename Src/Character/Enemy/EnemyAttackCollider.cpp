@@ -61,7 +61,7 @@ void EnemyAttackCollider::OnCollision
 /// ダメージ量を設定する
 /// </summary>
 /// <param name="_damage">敵に与えるダメージ量</param>
-void EnemyAttackCollider::SetDamage(float _damage)
+void EnemyAttackCollider::SetDamage(int _damage)
 {
     // 攻撃音も鳴らす
     EasyAudio::PlayOneShot(SE::enemy_attack);

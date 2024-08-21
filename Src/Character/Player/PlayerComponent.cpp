@@ -508,7 +508,7 @@ void PlayerComponent::AttackInitialize
 void PlayerComponent::CreateSwordSlashEffect
 (
 	GameObject& _camera,
-	int angle
+	float angle
 )
 {
 	// ³–Ê‚ğŒˆ’è‚·‚é

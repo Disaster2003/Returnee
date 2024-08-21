@@ -93,7 +93,7 @@ private:
 	void AttackInitialize(STATE_SWORD next, STATE_SWORD finish);
 
 	// aŒ‚Õ‚ğ¶¬‚·‚é
-	void CreateSwordSlashEffect(GameObject& _camera, int angle);
+	void CreateSwordSlashEffect(GameObject& _camera, float angle);
 
 	STATE_PLAYER state_player = STATE_PLAYER::ALIVE; // ƒvƒŒƒCƒ„[‚Ìó‘Ô
 	STATE_SWORD state_sword = STATE_SWORD::IDLE;	 // Œ•‚Ìó‘Ô

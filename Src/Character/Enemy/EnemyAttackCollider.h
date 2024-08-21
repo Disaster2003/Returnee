@@ -24,10 +24,10 @@ public:
         const ComponentPtr& self, const ComponentPtr& other) override;
 
 	// ダメージ量を設定する
-	void SetDamage(float _damage);
+	void SetDamage(int _damage);
 
 private:
-    float damage = 0; // ダメージ量
+    int damage = 0; // ダメージ量
 };
 
 #endif // !ENEMYATTACKCOLLIDER_H_INCLUDED

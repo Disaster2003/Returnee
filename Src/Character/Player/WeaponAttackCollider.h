@@ -47,14 +47,11 @@ public:
             enemy->TakeDamage(damage, player->GetOwner());
 
             // 氷の血しぶき
-            auto player_owner = player->GetOwner();
             for (int i = 0; i < 5; ++i)
             {
-                // 正面を決定する
-                const vec3 dirFront = { sin(player_owner->rotation.y), 0, cos(player_owner->rotation.y) };
-
                 // 発動を表すエフェクトを表示する
-                vec3 position_effect = player_owner->position - dirFront;
+                vec3 position_effect = (enemy->GetOwner()->position - player->GetOwner()->position) / 2 + player->GetOwner()->position;
+                position_effect.y += 1;
                 auto hitEffect = enemy->GetOwner()->GetEngine()->Create<GameObject>("hit effect", position_effect);
                 hitEffect->AddComponent<PlayerActionSuccessParticle>();
                 hitEffect->materials[0]->texBaseColor = GetOwner()->GetEngine()->GetTexture("Res/particle_damage.tga");
