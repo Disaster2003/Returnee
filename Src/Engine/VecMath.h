@@ -330,9 +330,10 @@ inline void MultiplyTransformVectors
 {
 	vec4 mn[4];
 	for (int i = 0; i < 4; ++i)
+	{
 		mn[i] = m[0] * n[i].x + m[1] * n[i].y + m[2] * n[i].z + m[3] * n[i].w;
-	for (int i = 0; i < 4; ++i)
 		result[i] = mn[i];
+	}
 }
 
 // 法線変換ベクトルの配列を計算
@@ -361,9 +362,10 @@ inline void MultiplyRotationVectors
 {
 	vec3 mn[3];
 	for (int i = 0; i < 3; ++i)
+	{
 		mn[i] = m[0] * n[i].x + m[1] * n[i].y + m[2] * n[i].z;
-	for (int i = 0; i < 3; ++i)
 		result[i] = mn[i];
+	}
 }
 
 // 3x3行列

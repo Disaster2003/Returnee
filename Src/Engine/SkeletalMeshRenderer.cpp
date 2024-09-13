@@ -72,10 +72,16 @@ void SkeletalMeshRenderer::Draw
     // 固有マテリアルがあれば固有マテリアルを、なければ共有マテリアルを使って描画
     const MaterialList* materials = &skeletalMesh->materials;
     if (!gameObject.materials.empty())
+    {
         materials = &gameObject.materials;
+    }
 
     if (program.ColorLocation() >= 0)
+    {
         ::Draw(skeletalMesh->drawParamsList, program, *materials, &gameObject.color);
+    }
     else
+    {
         ::Draw(skeletalMesh->drawParamsList, program, *materials, nullptr);
+    }
 }

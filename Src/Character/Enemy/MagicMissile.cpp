@@ -88,8 +88,10 @@ void MagicMissile::OnCollision
             }
         }
         else
+        {
             // ダメージを与える
             player->TakeDamage(damage, GetOwner());
+        }
 
         // 自身を破棄する
         GetOwner()->Destroy();
@@ -97,15 +99,23 @@ void MagicMissile::OnCollision
     }
     // ドラゴンにはヒットしない
     else if (strncmp(otherObject->name.c_str(), "Dragon", 6) == 0)
+    {
         return;
+    }
     // オークシャーマンにはヒットしない
     else if (strncmp(otherObject->name.c_str(), "Orc", 3) == 0)
+    {
         return;
+    }
     // ガード中じゃなければ、武器にヒットしない
     else if (otherObject->name == "player.hand")
+    {
         return;
+    }
     else if (otherObject->name == "weapon")
+    {
         return;
+    }
 
     // 自身を破棄する
     GetOwner()->Destroy();

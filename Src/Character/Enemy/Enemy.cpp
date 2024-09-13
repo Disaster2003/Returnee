@@ -57,7 +57,9 @@ Enemy::TARGET_INFO Enemy::GetTargetInfo() const
 {
     // UŒ‚‘ÎÛ‚ª‚¢‚È‚¯‚ê‚ÎA‰½‚à‚µ‚È‚¢
     if (!target)
+    {
         return {};
+    }
 
     TARGET_INFO targetInfo;
     const auto owner = GetOwner();
@@ -78,11 +80,17 @@ Enemy::TARGET_INFO Enemy::GetTargetInfo() const
     {
         constexpr float frontRange = 0.17365f; // cos(radians(80))
         if (targetInfo.cosƒÆ_by_left > frontRange)
+        {
             targetInfo.position_type = TARGET_INFO::POSITON_TYPE::RIGHT;
+        }
         else if (targetInfo.cosƒÆ_by_left < -frontRange)
+        {
             targetInfo.position_type = TARGET_INFO::POSITON_TYPE::LEFT;
+        }
         else
+        {
             targetInfo.position_type = TARGET_INFO::POSITON_TYPE::FRONT;
+        }
     }
 
     return targetInfo;

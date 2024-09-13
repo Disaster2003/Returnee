@@ -21,29 +21,41 @@ bool Intersect
 	// aの左側面がbの右側面より右にあるなら、交差していない
 	const float dx0 = b.max.x - a.min.x;
 	if (dx0 <= 0)
+	{
 		return false;
+	}
 	// aの右側面がbの左側面より左にあるなら、交差していない
 	const float dx1 = a.max.x - b.min.x;
 	if (dx1 <= 0)
+	{
 		return false;
+	}
 
 	// aの下面がbの上面より上にあるなら、交差していない
 	const float dy0 = b.max.y - a.min.y;
 	if (dy0 <= 0)
+	{
 		return false;
+	}
 	// aの上面がbの下面より下にあるなら、交差していない
 	const float dy1 = a.max.y - b.min.y;
 	if (dy1 <= 0)
+	{
 		return false;
+	}
 
 	// aの奥側面がbの手前側面より手前にあるなら、交差していない
 	const float dz0 = b.max.z - a.min.z;
 	if (dz0 <= 0)
+	{
 		return false;
+	}
 	// aの手前側面がbの奥側面より奥にあるなら、交差していない
 	const float dz1 = a.max.z - b.min.z;
 	if (dz1 <= 0)
+	{
 		return false;
+	}
 	// この時点で交差が確定
 
 	// XYZの各軸について、重なっている距離が短い方向を選択する
@@ -105,7 +117,9 @@ bool Intersect
 	const float r = a.radius + b.radius;	// aとbの半径の合計
 	// 平方根を避けるため、2乗同士で比較する
 	if (d2 > r * r)
+	{
 		return false;
+	}
 
 	// 交差しているので貫通ベクトルを求める
 	const float d = sqrt(d2);				// 「長さの2乗」を「長さ」に変換
@@ -130,9 +144,11 @@ vec3 ClosestPoint
 {
 	vec3 result;
 	for (int i = 0; i < 3; ++i)
+	{
 		// 指定された範囲に制限された値を返す
 		// std::clamp(元の値, 範囲の最小値, 範囲の最大値);
 		result[i] = std::clamp(point[i], aabb.min[i], aabb.max[i]);
+	}
 
 	return result;
 }
@@ -156,7 +172,9 @@ bool Intersect
 	const vec3 v = sphere.position - p;
 	const float d2 = dot(v, v);
 	if (d2 > sphere.radius * sphere.radius)
+	{
 		return false;
+	}
 
 	// 交差しているので、貫通ベクトルを求める
 	if (d2 > 0)
@@ -252,7 +270,9 @@ bool Intersect
 	const vec3 v = sphere.position - p;
 	const float d2 = dot(v, v);
 	if (d2 > sphere.radius * sphere.radius)
+	{
 		return false;
+	}
 
 	if (d2 > 0.00001f)
 	{
@@ -319,7 +339,9 @@ bool IntersectSlab
 	// 光線がスラブと平行な場合
 	// 発射点がスラブ内にあれば交差している、外にあれば交差していない
 	if (abs(direction) < 0.0001f)
+	{
 		return (start >= min) && (start <= max);
+	}
 
 	// 光線とスラブが交差する開始時刻と終了時刻を求める
 	float t0 = (min - start) / direction;
@@ -327,17 +349,23 @@ bool IntersectSlab
 
 	// 時刻の早い側を開始時刻とする
 	if (t0 > t1)
+	{
 		std::swap(t0, t1);
+	}
 
 	// 共通の交差範囲を求める
 	// 以前の開始時刻と今回の開始時刻を比較し、遅いほうを選択する
 	if (t0 > tmin)
+	{
 		tmin = t0;
+	}
 
 	// 共通の交差範囲を求める
 	// 以前の終了時刻と今回の終了時刻を比較し、早いほうを選択する
 	if (t1 < tmax)
+	{
 		tmax = t1;
+	}
 
 	//「開始時刻<=終了時刻」の場合は交差している
 	return tmin <= tmax;
@@ -363,15 +391,21 @@ bool Intersect
 
 	// Xスラブとの交差判定を行う
 	if (!IntersectSlab(aabb.min.x, aabb.max.x, ray.start.x, ray.direction.x, tmin, tmax))
+	{
 		return false; // 交差していない
+	}
 
 	// Yスラブとの交差判定を行う
 	if (!IntersectSlab(aabb.min.y, aabb.max.y, ray.start.y, ray.direction.y, tmin, tmax))
+	{
 		return false; // 交差していない
+	}
 
 	// Zスラブとの交差判定を行う
 	if (!IntersectSlab(aabb.min.z, aabb.max.z, ray.start.z, ray.direction.z, tmin, tmax))
+	{
 		return false; // 交差していない
+	}
 
 	//交点までの距離を設定する
 	distance = tmin;
@@ -399,12 +433,16 @@ bool Intersect
 	// 光線の始点が球体の外にあり(c > 0)、光線が球体から離れていく方向に
 	// 発射された(b > 0)場合、球体と光線は交差しない
 	if (c > 0 && b > 0)
+	{
 		return false;
+	}
 
 	// 判別式が負の場合は解なし
 	const float d = b * b - c; // 判別式
 	if (d < 0)
+	{
 		return false;
+	}
 
 	// 最初に交差する位置を計算する
 	distance = -b - sqrt(d);
@@ -413,7 +451,9 @@ bool Intersect
 	// (始点が球体外にある状況は、球体から離れていく光線の判定で除外済み)
 	// この場合、始点を「最初に交差する位置」とする
 	if (distance < 0)
+	{
 		distance = 0;
+	}
 
 	// 交差している
 	return true;
@@ -446,7 +486,9 @@ bool IntersectSlab
 	// 光線がスラブと平行な場合
 	// 発射点がスラブ内にあれば交差している、外にあれば交差していない
 	if (abs(e) < 0.0001f)
+	{
 		return (f >= -scale) && (f <= scale);
+	}
 
 	// 光線とスラブが交わる範囲の開始時刻と終了時刻を求める
 	float t0 = (-scale - f) / e;
@@ -462,11 +504,15 @@ bool IntersectSlab
 
 	// 以前の開始時刻と今回の開始時刻を比較し、遅いほうを選択する
 	if (t0 > tmin)
+	{
 		tmin = t0;
+	}
 
 	// 以前の終了時刻と今回の終了時刻を比較し、早いほうを選択する
 	if (t1 < tmax)
+	{
 		tmax = t1;
+	}
 
 	// 「開始時刻 <= 終了時刻」の場合は交差している
 	return tmin <= tmax;
@@ -493,8 +539,12 @@ bool Intersect
 	float tmin = 0;
 	float tmax = FLT_MAX;
 	for (int i = 0; i < 3; ++i)
-		if (!IntersectSlab(box.axis[i], box.scale[i],start, ray.direction, tmin, tmax))
+	{
+		if (!IntersectSlab(box.axis[i], box.scale[i], start, ray.direction, tmin, tmax))
+		{
 			return false; // 交差していない
+		}
+	}
 
 	// 交点までの距離を設定する
 	distance = tmin;

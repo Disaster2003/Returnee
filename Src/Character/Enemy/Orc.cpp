@@ -100,7 +100,9 @@ void Orc::TakeDamage
 {
     // 状態が「死亡」なら何も起こらない
     if (state == STATE_ORC::DEAD)
+    {
         return;
+    }
 
     // 斬られた音を鳴らす
     EasyAudio::PlayOneShot(SE::sword_hit);
@@ -131,7 +133,9 @@ void Orc::StartWait()
 {
     // 状態が「待機」なら何もしない
     if (state == STATE_ORC::WAIT)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -151,7 +155,9 @@ void Orc::StartWalk()
 {
     // 状態が「追跡」なら何もしない
     if (state == STATE_ORC::WALK)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -171,7 +177,9 @@ void Orc::StartAttack()
 {
     // 状態が「攻撃」なら何もしない
     if (state == STATE_ORC::ATTACK)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -179,9 +187,13 @@ void Orc::StartAttack()
         animator->SetSpeed(SPEED_ANIMATION);
         // 「攻撃」、「横攻撃」をランダムで選んで行う
         if (Random::Range(0, 1) <= 0.5f)
+        {
             animator->Play("attack");
+        }
         else
+        {
             animator->Play("attack.right");
+        }
     }
 
     // ダメージ量を設定する
@@ -205,7 +217,9 @@ void Orc::StartAttackMagicMissile()
 {
     // 状態が「魔法攻撃」なら何もしない
     if (state == STATE_ORC::ATTACK_MAGICMISSILE)
+    {
         return;
+    }
 
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
@@ -247,16 +261,22 @@ void Orc::StartDead()
 {
     // 状態が「死亡」なら何もしない
     if (state == STATE_ORC::DEAD)
+    {
         return;
+    }
 
     if (animator)
     {
         // 「死」アニメーションを再生する
         animator->SetSpeed(SPEED_ANIMATION);
         if (Random::Range(0, 1) <= 0.5f)
+        {
             animator->Play("down.0");
+        }
         else
+        {
             animator->Play("down.1");
+        }
     }
 
     // 状態を「死亡」にする
@@ -360,9 +380,13 @@ void Orc::DoWalk(float deltaTime)
 
     // 攻撃開始タイマーを更新する
     if (job == JOB::FIGHTER)
+    {
         time_attack = std::max(time_attack - deltaTime, 0.0f);
+    }
     else if (job == JOB::MAGICIAN)
+    {
         time_magic = std::max(time_magic - deltaTime, 0.0f);
+    }
 
     const vec3 dirFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
     const vec3 dirLeft = { cos(owner->rotation.y), 0, -sin(owner->rotation.y) };
@@ -396,10 +420,14 @@ void Orc::DoWalk(float deltaTime)
     // 敵までの距離が攻撃範囲の境界に来るように加速方向を切り替える
     constexpr float accel = 4; // 基本加速度
     if (targetInfo.distance > DISTANCE_ATTACK)
+    {
         characterMovement->AccelerateXZ(dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
+    }
     else
+    {
         // 逆方向に加速(減速)する
         characterMovement->AccelerateXZ(-dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
+    }
 }
 
 /// <summary>
@@ -442,7 +470,9 @@ void Orc::DoAttackMagicMissile(float deltaTime)
     // 詠唱開始から0.8秒後に魔法を発動する
     const float t = animator->GetTimer();
     if (isCasted || t < 0.8f)
+    {
         return;
+    }
 
     // 発射
     isCasted = true;

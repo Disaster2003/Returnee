@@ -74,11 +74,16 @@ void Dragon::Update(float deltaTime)
 
     // 怒り状態にする
     if (!isAngry)
+    {
         if (Dragon::GetHp() <= HP_MAX / 3)
+        {
             isAngry = true;
+        }
+    }
 
     // 怒りモードに入ったら、疑似赤いスーパーサイヤ人
     if (isAngry)
+    {
         if (angry_effect_span <= 0)
         {
             angry_effect_span = 1.0f;
@@ -88,6 +93,7 @@ void Dragon::Update(float deltaTime)
             smoke->AddComponent<Smoke>();
             smoke->materials[0]->emission = { 1.0f, 0.05f, 0.05f };
         }
+    }
     angry_effect_span -= deltaTime;
 
     /*
@@ -165,7 +171,9 @@ void Dragon::StartWait()
 {
     // 状態が「待機」なら何もしない
     if (state == STATE_DRAGON::WAIT)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -185,7 +193,9 @@ void Dragon::StartWalk()
 {
     // 状態が「追跡」なら何もしない
     if (state == STATE_DRAGON::WALK)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -205,7 +215,9 @@ void Dragon::StartAttack()
 {
     // 状態が「攻撃」なら何もしない
     if (state == STATE_DRAGON::ATTACK)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -222,6 +234,7 @@ void Dragon::StartAttack()
 
     // 怒り状態なら
     if (isAngry)
+    {
         // 攻撃回数が残っていたら
         if (attack_max != 0)
         {
@@ -239,9 +252,12 @@ void Dragon::StartAttack()
             // 攻撃回数を補充する
             attack_max = 2;
         }
+    }
     else
+    {
         // 次に攻撃するまでの時間(0.5～1.5秒)
         time_attack = float(std::rand() % 11) * 0.1f + 0.5f;
+    }
 
     // 状態を「攻撃」にする
     state = STATE_DRAGON::ATTACK;
@@ -255,7 +271,9 @@ void Dragon::StartAttackTail()
 {
     // 状態が「尻尾攻撃」なら何もしない
     if (state == STATE_DRAGON::ATTACK_TAIL)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -288,7 +306,9 @@ void Dragon::StartAttackFireBall()
 {
     // 状態が「火炎弾攻撃」なら何もしない
     if (state == STATE_DRAGON::ATTACK_FIREBALL)
+    {
         return;
+    }
 
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
@@ -312,6 +332,7 @@ void Dragon::StartAttackFireBall()
 
     // 怒り状態なら
     if (isAngry)
+    {
         // 攻撃回数が残っていたら
         if (attack_max != 0)
         {
@@ -329,9 +350,12 @@ void Dragon::StartAttackFireBall()
             // 攻撃回数を補充する
             attack_max = 2;
         }
+    }
     else
+    {
         // 次に火炎弾攻撃するまでの時間(0.5～2.0秒)
         time_attack_fire_ball = float(std::rand() % 16) * 0.1f + 0.5f;
+    }
 
     // 火炎弾攻撃準備
     isCasted = false;
@@ -347,7 +371,9 @@ void Dragon::StartHovering()
 {
     // 状態が「空中滞在」なら何もしない
     if (state == STATE_DRAGON::HOVERING)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -376,7 +402,9 @@ void Dragon::StartHoveringAndFire()
 {
     // 状態が「空中滞在」なら何もしない
     if (state == STATE_DRAGON::HOVERING_AND_FIRE)
+    {
         return;
+    }
 
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
@@ -415,7 +443,9 @@ void Dragon::StartDead()
 {
     // 状態が「死亡」なら何もしない
     if (state == STATE_DRAGON::DEAD)
+    {
         return;
+    }
 
     if (animator)
     {
@@ -549,6 +579,7 @@ void Dragon::DoWalk(float deltaTime)
             {
                 // Healthが半分以下なら、「尻尾攻撃」をランダムで選んで行う
                 if (isAngry)
+                {
                     // ランダムに出た数字が0.5以下なら
                     if (Random::Range(0, 1) <= 0.5f)
                     {
@@ -556,6 +587,7 @@ void Dragon::DoWalk(float deltaTime)
                         StartAttackTail();
                         return;
                     }
+                }
 
                 // 「攻撃」を開始する
                 StartAttack();
@@ -580,13 +612,19 @@ void Dragon::DoWalk(float deltaTime)
     if (targetInfo.distance > DISTANCE_ATTACK)
     {
         if (isAngry)
+        {
             characterMovement->AccelerateXZ(dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY * 0.5f);
+        }
         else
+        {
             characterMovement->AccelerateXZ(dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
+        }
     }
     else
+    {
         // 逆方向に加速(減速)する
         characterMovement->AccelerateXZ(-dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
+    }
 }
 
 /// <summary>
@@ -647,7 +685,9 @@ void Dragon::DoAttackFireBall(float deltaTime)
     // 詠唱開始から0.8秒後に魔法を発動する
     const float t = animator->GetTimer();
     if (isCasted || t < 0.8f)
+    {
         return;
+    }
 
     // 発射
     isCasted = true;
@@ -669,9 +709,12 @@ void Dragon::DoHovering(float deltaTime)
     {
         // 目的地に到着
         if (attack_max <= 0)
+        {
             StartWalk();
+        }
         else
             for (int i = 11; i >= 0; i--)
+            {
                 if (destination.x == position_hovering[i].x &&
                     destination.z == position_hovering[i].z)
                 {
@@ -680,14 +723,18 @@ void Dragon::DoHovering(float deltaTime)
                         float theta = GetTargetInfo().cosθ_by_left;
                         owner->rotation.y += 30 * theta * deltaTime;
                         if (GetTargetInfo().position_type == TARGET_INFO::POSITON_TYPE::FRONT)
+                        {
                             StartHoveringAndFire();
+                        }
                     }
-
                     else
+                    {
                         destination = position_hovering[i + 1];
+                    }
 
                     break;
                 }
+            }
     }
     else
     {
@@ -735,7 +782,9 @@ void Dragon::DoHoveringAndFire(float deltaTime)
     // 詠唱開始から0.8秒後に魔法を発動する
     const float t = animator->GetTimer();
     if (isCasted || t < 0.8f)
+    {
         return;
+    }
 
     // 発射
     isCasted = true;
@@ -790,7 +839,8 @@ void Dragon::HpGauge
 {
     // プレイヤーが近づいたら、ボスの体力を表示する
     const auto targetInfo = GetTargetInfo();
-    if (GetTarget()->GetComponent<PlayerComponent>()->GetStatePlayer() == PlayerComponent::STATE_PLAYER::ALIVE && targetInfo.distance <= DISTANCE_SEARCH)
+    if (GetTarget()->GetComponent<PlayerComponent>()->GetStatePlayer() == PlayerComponent::STATE_PLAYER::ALIVE &&
+        targetInfo.distance <= DISTANCE_SEARCH)
     {
         // 体力ゲージのフレームを生成していなかったら
         if (!ui_hp_frame)
@@ -814,9 +864,13 @@ void Dragon::HpGauge
 
         // 体力ゲージの増減を計算させる
         if (current_ratio > targetRatio)
+        {
             current_ratio = std::max(current_ratio - deltaTime * 0.5f, targetRatio);
+        }
         else if (current_ratio < targetRatio)
+        {
             current_ratio = std::min(current_ratio + deltaTime * 0.5f, targetRatio);
+        }
 
         // 体力ゲージ全体のスケーリング
         switch (mode_scaling)
@@ -831,7 +885,9 @@ void Dragon::HpGauge
             break;
         case MODE_SCALING::STATIONARY:
             if (current_ratio <= 0)
+            {
                 mode_scaling = MODE_SCALING::CLOSE;
+            }
             break;
 
         case MODE_SCALING::CLOSE:

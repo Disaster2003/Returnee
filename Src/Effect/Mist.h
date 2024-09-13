@@ -32,16 +32,22 @@ public:
 		// 一定時間経ったら
 		timer += deltaTime;
 		if (timer >= life_span)
+		{
 			// 自身を破棄する
 			GetOwner()->Destroy();
+		}
 
 		// 寿命が半分以下なら
 		if (timer >= life_span / 2)
+		{
 			// 透明にしていく
 			GetOwner()->color[3] = (life_span - timer) / (life_span / 2);
+		}
 		else
+		{
 			// 不透明にしていく
 			GetOwner()->color[3] = timer / (life_span / 2);
+		}
 	}
 
 private:
@@ -81,7 +87,9 @@ public:
 		// インターバル中
 		timer += deltaTime;
 		if (timer < time_particle)
+		{
 			return;
+		}
 
 		// インターバル中にする
 		timer -= time_particle;

@@ -173,7 +173,9 @@ Texture::Texture(const char* filename)
 
 	// アラインメントを元に戻す
 	if (alignment != imageAlignment)
+	{
 		glPixelStorei(GL_UNPACK_ALIGNMENT, alignment);
+	}
 
 	// グレースケールテクスチャの場合、赤成分を緑と青にコピーするように設定する
 	if (format->imageFormat == GL_RED)
@@ -208,11 +210,13 @@ Texture::Texture
 
 	// 1枚でもテクスチャの読み込みに失敗していたら作成しない
 	for (const auto& e : t)
+	{
 		if (!e)
 		{
 			LOG_ERROR("キューブマップ%sの画像の読み込みに失敗", name);
 			return; // 6枚そろっていないと作成できない
 		}
+	}
 
 	// 画像サイズを取得する
 	const int w = t[0].GetWidth();
@@ -223,11 +227,13 @@ Texture::Texture
 		return; // 縦と横が同じサイズでないと作成できない
 	}
 	for (const auto& e : t)
+	{
 		if (e.GetWidth() != w || e.GetHeight() != h)
 		{
 			LOG_ERROR("キューブマップ%sの画像サイズが一致しません", name);
 			return; // すべてのサイズが等しくないと作成できない
 		}
+	}
 
 	// 画像形式を取得する
 	GLint gpuFormat;
@@ -250,8 +256,10 @@ Texture::Texture
 	glCreateTextures(GL_TEXTURE_CUBE_MAP, 1, &id);
 	glTextureStorage2D(id, levels, gpuFormat, w, h);
 	for (int i = 0; i < 6; ++i)
+	{
 		glCopyImageSubData(t[i], GL_TEXTURE_2D, 0, 0, 0, 0,
 			id, GL_TEXTURE_CUBE_MAP, 0, 0, 0, i, w, h, 1);
+	}
 
 	// ミップマップを生成する
 	glGenerateTextureMipmap(id);

@@ -97,7 +97,9 @@ public:
 			// shared_ptrの場合はdynamic_castではなくdynamic_pointer_castを使う
 			auto p = std::dynamic_pointer_cast<T>(e);
 			if (p)
+			{
 				return p; // 見つかったコンポーネントを返す
+			}
 		}
 		return nullptr;	  // 見つからなかったのでnullptrを返す
 	}

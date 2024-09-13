@@ -79,10 +79,14 @@ namespace
 		tmp.depth = Get(buf + 20);
 		tmp.mipmapCount = Get(buf + 24);
 		for (int i = 0; i < 11; ++i)
+		{
 			tmp.reserved1[i] = Get(buf + 28 + i * 4);
+		}
 		tmp.ddspf = ReadDDSPixelFormat(buf + 72);
 		for (int i = 0; i < 4; ++i)
+		{
 			tmp.caps[i] = Get(buf + 104 + i * 4);
+		}
 		tmp.reserved2 = Get(buf + 120);
 		return tmp;
 	}
@@ -158,6 +162,7 @@ GLuint LoadDDS(const char* filename)
 		};
 		bool supported = false;
 		for (const auto& e : formatList)
+		{
 			if (header.ddspf.fourCC == e.fourCC)
 			{
 				imageFormat = e.imageFormat;
@@ -165,6 +170,7 @@ GLuint LoadDDS(const char* filename)
 				supported = true;
 				break;
 			}
+		}
 
 		// ピクセル形式がDX10追加データで定義されている場合
 		if (!supported && header.ddspf.fourCC == MakeFourCC('D', 'X', '1', '0'))
@@ -259,9 +265,13 @@ GLuint LoadDDS(const char* filename)
 	// 拡大縮小フィルタを設定する
 	// 縮小フィルタはミップマップを考慮して選択
 	if (header.mipmapCount > 1)
+	{
 		glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+	}
 	else
+	{
 		glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	}
 
 	glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 

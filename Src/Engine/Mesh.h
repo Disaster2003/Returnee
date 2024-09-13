@@ -106,7 +106,9 @@ inline MaterialList CloneMaterialList(const StaticMeshPtr& original)
 {
 	MaterialList clone(original->materials.size());
 	for (int i = 0; i < clone.size(); ++i)
+	{
 		clone[i] = std::make_shared<MATERIAL>(*original->materials[i]);
+	}
 
 	return clone;
 }

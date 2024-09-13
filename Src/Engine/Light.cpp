@@ -20,7 +20,9 @@ void Light::Awake()
 {
 	// ライトを取得していなければ、ライトを取得する
 	if (index_light < 0)
+	{
 		index_light = GetOwner()->GetEngine()->AllocateLight();
+	}
 }
 
 /// <summary>

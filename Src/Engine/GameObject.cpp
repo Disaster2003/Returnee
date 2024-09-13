@@ -12,7 +12,9 @@ GameObject::~GameObject()
 	// 死ぬ前に親子関係を解除する
 	SetParent(nullptr);
 	for (auto child : children)
+	{
 		child->parent = nullptr;
+	}
 }
 
 /// <summary>
@@ -21,7 +23,9 @@ GameObject::~GameObject()
 void GameObject::RemoveDestroyedComponent()
 {
 	if (components.empty())
+	{
 		return;	// コンポーネントを持っていなければ何もしない
+	}
 
 	// 破棄予定の有無でコンポーネントを分ける
 	const auto iter =
@@ -54,7 +58,9 @@ void GameObject::RemoveDestroyedComponent()
 
 	// 破棄予定のコンポーネントのOnDestroyを実行する
 	for (auto& e : destroyList)
+	{
 		e->OnDestroy();
+	}
 
 	// ここで実際にコンポーネントが削除される(destroyListの寿命が終わるため)
 }
@@ -66,8 +72,10 @@ void GameObject::Start()
 {
 	for(auto& e : components)
 	{
-		if(!e->isStarted)
+		if (!e->isStarted)
+		{
 			e->Start();
+		}
 
 		e->isStarted = true;
 	}
@@ -79,8 +87,10 @@ void GameObject::Start()
 /// <param name="deltaTime">前回の更新からの経過時間(秒)</param>
 void GameObject::Update(float deltaTime)
 {
-	for(auto& e : components)
+	for (auto& e : components)
+	{
 		e->Update(deltaTime);
+	}
 	
 	RemoveDestroyedComponent();
 }
@@ -96,8 +106,10 @@ void GameObject::OnCollision
 	const ComponentPtr& other
 )
 {
-	for(auto& e : components)
-		e->OnCollision(self,other);
+	for (auto& e : components)
+	{
+		e->OnCollision(self, other);
+	}
 }
 
 /// <summary>
@@ -105,8 +117,10 @@ void GameObject::OnCollision
 /// </summary>
 void GameObject::OnDestroy()
 {
-	for(auto& e : components)
+	for (auto& e : components)
+	{
 		e->OnDestroy();
+	}
 }
 
 /// <summary>
@@ -119,7 +133,9 @@ void GameObject::SetParent(GameObject* parent)
 {
 	// 同じ親を指定された場合は何もしない
 	if (parent == this->parent)
+	{
 		return;
+	}
 
 	// 別の親がある場合、その親との関係を解除する
 	if (this->parent)
@@ -128,12 +144,16 @@ void GameObject::SetParent(GameObject* parent)
 		auto& c = this->parent->children;
 		auto itr = std::find(c.begin(), c.end(), this);
 		if (itr != c.end())
+		{
 			c.erase(itr); // 配列から自分を削除する
+		}
 	}
 
 	// 新たな親子関係を設定する
 	if (parent)
+	{
 		parent->children.push_back(this);
+	}
 
 	this->parent = parent;
 	number_joint_parent = number_joint_invalid; // 無効な関節番号を設定する

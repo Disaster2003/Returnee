@@ -49,12 +49,14 @@ public:
 
         // min‚Ì‚Ù‚¤‚ª‘å‚«‚©‚Á‚½‚ç“ü‚ê‘Ö‚¦‚é
         for (int i = 0; i < 3; ++i)
+        {
             if (p->aabb.min[i] > p->aabb.max[i])
             {
                 const float tmp = p->aabb.min[i];
                 p->aabb.min[i] = p->aabb.max[i];
                 p->aabb.max[i] = tmp;
             }
+        }
 
         return p;
     }

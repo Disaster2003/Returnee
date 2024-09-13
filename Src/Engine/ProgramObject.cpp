@@ -68,7 +68,9 @@ ProgramObject::ProgramObject
 	fs = CompileShader(GL_FRAGMENT_SHADER, filenameFS);
 
 	if (vs == 0 || fs == 0)
+	{
 		return;
+	}
 
 	// 2つのシェーダをリンク
 	prog = glCreateProgram();

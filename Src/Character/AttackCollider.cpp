@@ -23,7 +23,9 @@ void AttackCollider::Update(float deltaTime)
 {
     // 起動していなければ何もしない
     if (state == STATE_ATTACK_COLLIDER::SLEEP)
+    {
         return;
+    }
 
     // 経過時間を更新する
     timer += deltaTime;
@@ -34,17 +36,23 @@ void AttackCollider::Update(float deltaTime)
     case STATE_ATTACK_COLLIDER::SLEEP:
         // コライダー起動
         if (timer >= 0.3f)
+        {
             state = STATE_ATTACK_COLLIDER::COLLISION_ENABLE;
+        }
         break;
     case STATE_ATTACK_COLLIDER::COLLISION_ENABLE:
         // コライダー停止
         if (timer >= 0.5f)
+        {
             state = STATE_ATTACK_COLLIDER::COLLISION_DISABLE;
+        }
         break;
     case STATE_ATTACK_COLLIDER::COLLISION_DISABLE:
         // コライダーOff
         if (timer >= 0.6f)
+        {
             Deactivate();
+        }
         break;
     }
 }

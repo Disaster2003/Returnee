@@ -57,7 +57,9 @@ public:
 
         // プレイ中じゃなければ、ガイドの破棄
         if (player->GetStatePlayer() != PlayerComponent::STATE_PLAYER::ALIVE)
+        {
             ui_guide_action->GetOwner()->Destroy();
+        }
         else if (isArrivedBossRoom)
         {
             // 操作ガイドを変更していたら
@@ -73,11 +75,15 @@ public:
             ui_guide_control->GetOwner()->Destroy();
             // 戦闘操作ガイドの生成
             if (!ui_guide_action)
+            {
                 ui_guide_action = engine->CreateUIObject<UILayout>("Res/UI_guide_action.dds", { -1.40f, 0.00f }, 0.60f).second;
+            }
         }
         // 基本操作ガイドの生成
         else if (!ui_guide_control)
+        {
             ui_guide_control = engine->CreateUIObject<UILayout>("Res/UI_guide_control.dds", { -1.40f, 0.00f }, 0.60f).second;
+        }
     }
 
     /// <summary>
@@ -98,15 +104,21 @@ public:
     {
         // 3回点滅したら終了
         if (timer >= 3.0f)
+        {
             return;
+        }
 
         // 小数点以下が0.5秒以上の場合
         if (fmod(timer, 1.0f) > 0.5f)
+        {
             // 表示する
             _ui_guide->position_base.y = 0;
+        }
         else
+        {
             // 非表示にする
             _ui_guide->position_base.y = 10;
+        }
 
         // ガイドの変更した後、時間計測
         timer += _deltaTime;
@@ -143,11 +155,17 @@ public:
         {
 
             if (state_guide == GET_TREASURE)
+            {
                 ui_guide_get_treasure->GetOwner()->Destroy();
+            }
             else if (state_guide == BOSS_BATTLE)
+            {
                 ui_guide_boss_battle->GetOwner()->Destroy();
+            }
             else if (state_guide == PLAYER_FORWARD)
+            {
                 ui_guide_player_forward->GetOwner()->Destroy();
+            }
         }
         else if (state_guide == GET_TREASURE)
         {
@@ -164,7 +182,9 @@ public:
             ui_guide_boss_battle->GetOwner()->Destroy();
             // ゴール間近目標ガイドの生成
             if (!ui_guide_get_treasure)
+            {
                 ui_guide_get_treasure = engine->CreateUIObject<UILayout>("Res/UI_task_get_treasure.dds", { 1.10f, 0.80f }, 0.20f).second;
+            }
         }
         else if (state_guide == BOSS_BATTLE)
         {
@@ -181,11 +201,15 @@ public:
             ui_guide_player_forward->GetOwner()->Destroy();
             // ボス討伐目標ガイドの生成
             if (!ui_guide_boss_battle)
+            {
                 ui_guide_boss_battle = engine->CreateUIObject<UILayout>("Res/UI_task_kill_dragon.dds", { 1.10f, 0.80f }, 0.20f).second;
+            }
         }
         // 初期目標ガイドの生成
         else if (!ui_guide_player_forward)
+        {
             ui_guide_player_forward = engine->CreateUIObject<UILayout>("Res/UI_task_go_straight.dds", { 1.10f, 0.80f }, 0.20f).second;
+        }
     }
 
     // 次の段階へ設定する
@@ -204,15 +228,21 @@ public:
     {
         // 3回点滅したら終了
         if (timer >= 3.0f)
+        {
             return;
+        }
 
         // 小数点以下が0.5秒以上の場合
         if (fmod(timer, 1.0f) > 0.5f)
+        {
             // 表示する
             _ui_guide->position_base.y = 0.80f;
+        }
         else
+        {
             // 非表示にする
             _ui_guide->position_base.y = 10;
+        }
 
         // ガイドの変更した後、時間計測
         timer += _deltaTime;
@@ -249,7 +279,9 @@ public:
     virtual void Update(float deltaTime) override
     {
         if (!doClosing || !enter)
+        {
             return;
+        }
         
         // 岩石を上げる
         enter->position.y += 8 * deltaTime;
@@ -293,7 +325,9 @@ public:
 
             // ボスの索敵距離をボスエリア全体に
             if (boss && boss->GetOwner())
+            {
                 boss->SetSearchDistance(30);
+            }
         }
     }
 
@@ -1243,16 +1277,24 @@ bool ExplorationScene::Initialize(Engine& engine)
         }
         // 雑魚部屋侵入検知器の配置
         else if (go->name == "EnemyTrigger")
+        {
             enemyTrigger = go;
+        }
         // ボス部屋侵入検知器の配置
         else if (go->name == "BossTrigger")
+        {
             bossTrigger = go;
+        }
         // ボス部屋の入り口を封鎖するための岩の配置
         else if (go->name == "Enter")
+        {
             enter = go;
+        }
         // ボス部屋の出口を封鎖するための岩の配置
         else if (go->name == "Exit")
+        {
             exit = go;
+        }
     }
 
     // 雑魚部屋侵入検知器の初期設定
@@ -1260,7 +1302,9 @@ bool ExplorationScene::Initialize(Engine& engine)
     {
         auto box = enemyTrigger->GetComponent<BoxCollider>();
         if (box)
+        {
             box->isTrigger = true;
+        }
         auto a = enemyTrigger->AddComponent<EnemyTrigger>();
         a->controlGuide = player->AddComponent<ControlGuide>();
     }
@@ -1269,7 +1313,9 @@ bool ExplorationScene::Initialize(Engine& engine)
     {
         auto box = bossTrigger->GetComponent<BoxCollider>();
         if (box)
+        {
             box->isTrigger = true;
+        }
         auto a = bossTrigger->AddComponent<BossTrigger>();
         a->enter = enter;
         a->taskGuide = player->AddComponent<TaskGuide>();

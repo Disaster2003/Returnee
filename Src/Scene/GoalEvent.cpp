@@ -51,7 +51,9 @@ void GoalEvent::Update(float deltaTime)
 		obj_fade->color[3] = 1 - time_fade;
 		// フェードアウトが終わったら、タイトル画面に切り替える
 		if (time_fade <= 0)
+		{
 			engine->SetNextScene<TitleScene>();
+		}
 	} // if fadeTimer
 }
 
@@ -68,7 +70,9 @@ void GoalEvent::OnCollision
 {
 	// 一度だけプレイヤーと衝突できる
 	if (isTriggered || other->GetOwner()->name != "player")
+	{
 		return;
+	}
 
 	isTriggered = true; // 状態を「衝突済み」にする
 

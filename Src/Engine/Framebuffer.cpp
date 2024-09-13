@@ -33,7 +33,9 @@ FramebufferObject::FramebufferObject
         height = texture_color->GetHeight();
     }
     else
+    {
         glNamedFramebufferDrawBuffer(fbo, GL_NONE);
+    }
 
     // 深度バッファを設定する
     if (depth)

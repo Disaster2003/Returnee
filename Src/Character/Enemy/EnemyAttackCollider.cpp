@@ -17,7 +17,9 @@ void EnemyAttackCollider::OnCollision
 {
     // 攻撃判定が起動してなかったら、何も起こさない
     if (EnemyAttackCollider::GetState() != STATE_ATTACK_COLLIDER::COLLISION_DISABLE)
+    {
         return;
+    }
 
     auto engine = GetOwner()->GetEngine();
     auto otherObject = other->GetOwner();
@@ -49,8 +51,10 @@ void EnemyAttackCollider::OnCollision
             }
         }
         else
+        {
             // ダメージを与える
             player->TakeDamage(damage, GetOwner()->GetParent());
+        }
 
         // 攻撃処理を停止する
         Deactivate();

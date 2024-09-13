@@ -90,7 +90,9 @@ void TitleScene::Update
 		c = std::min(c + deltaTime * 0.5f, 1.0f);
 		ui_background_title->GetOwner()->materials[0]->baseColor = { c, c, c, 1 };
 		if (c >= 1)
+		{
 			c = 1;
+		}
 	}
 
 	// 徐々にフェードアウト
@@ -101,7 +103,9 @@ void TitleScene::Update
 
 		// フェードアウトが終わったら、プレイ画面に切り替える
 		if (time_fade <= 0)
+		{
 			engine.SetNextScene<ExplorationScene>();
+		}
 	}//if fadeTimer
 }
 

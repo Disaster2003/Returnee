@@ -58,7 +58,9 @@ int AnimationCurve::AddKey
                                
     int count = 0;             // 追加した要素数
     for (auto itr = begin; itr != end; ++itr)
+    {
         count += AddKey(itr->time, itr->value);
+    }
 
     return count;
 }
@@ -70,9 +72,13 @@ int AnimationCurve::AddKey
 vec3 AnimationCurve::Evaluate(float time) const
 {
     if (keys.empty())
+    {
         return vec3(0);             // キーフレームがない場合
+    }
     else if (keys.size() == 1)
+    {
         return keys.begin()->value; // キーフレームがひとつの場合
+    }
 
     // 時刻に対応するキーフレームを検索する
     auto itr = std::lower_bound(keys.begin(), keys.end(), time,
@@ -80,11 +86,15 @@ vec3 AnimationCurve::Evaluate(float time) const
 
     // 先頭が見つかった場合は先頭キーフレームの値を返す
     if (itr == keys.begin())
+    {
         return itr->value;
+    }
 
     // 見つからなかった場合は末尾のキーフレームの値を返す
     if (itr == keys.end())
+    {
         return keys.back().value;
+    }
 
     // 見つけたキーフレームとひとつ前のキーフレームを線形補間する
     auto prev = itr - 1; // ひとつ前のキーフレーム
@@ -99,8 +109,10 @@ float AnimationCurve::Length() const
 {
     // 見つからない場合
     if (keys.empty())
+    {
         // 0を返す
         return 0;
+    }
 
     // アニメーションの長さ(秒)の値を返す
     return keys.back().time;
@@ -158,14 +170,18 @@ void AnimationClip::Evaluate
     // ボーン数を取得する
     size_t count = 0;
     if (gameObject.renderer)
+    {
         count = gameObject.renderer->GetJointMatrixCount();
+    }
 
     // すべてのアニメーションカーブを評価する
     for (const auto& e : curves)
     {
         // カーブのボーン番号がボーン数以上の場合は何もしない
         if (e.targetBone >= count)
+        {
             continue;
+        }
 
         // timeにおけるカーブを評価する
         const vec3 v = e.curve->Evaluate(time);
@@ -204,7 +220,9 @@ void Animator::Update(float deltaTime)
 {
     // クリップが設定されていない、または再生されていない場合は何もしない
     if (!current_clip || !isPlaying)
+    {
         return;
+    }
 
     // 経過時間を更新する
     timer += deltaTime * speed;
@@ -212,8 +230,10 @@ void Animator::Update(float deltaTime)
     // ループの有無で処理を分ける
     const float length = current_clip->Length();
     if (current_clip->IsLoop())
+    {
         // アニメーションの再生時間でループ
         timer = fmod(timer + length, length);
+    }
     else
     {
         // 再生時間を超過していたら再生を停止する
@@ -281,7 +301,9 @@ void Animator::Play(const char* name)
     // 座標変換パラメータを初期値に戻す
     auto owner = GetOwner();
     if (owner->renderer)
+    {
         owner->renderer->ClearJointTransforms();
+    }
 
     // クリップを設定し、再生状態にする
     current_clip_name = itr->first;

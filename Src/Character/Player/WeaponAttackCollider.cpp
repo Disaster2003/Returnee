@@ -19,7 +19,9 @@ void WeaponAttackCollider::OnCollision
 {
     // 攻撃判定が起動してなかったら、何も起こさない
     if (WeaponAttackCollider::GetState() != STATE_ATTACK_COLLIDER::COLLISION_ENABLE)
+    {
         return;
+    }
 
     // 攻撃処理
     auto obj_target = other->GetOwner();
@@ -54,9 +56,13 @@ int WeaponAttackCollider::EnemyJudge(const char* s) const
 {
     // ドラゴンやオークに攻撃が当たっていたらtrue
     if (strncmp(s, "Dragon", 6) == 0)
+    {
         return 1;
+    }
     if (strncmp(s, "Orc", 3) == 0)
+    {
         return 2;
+    }
 
     // 異なっていたらfalse
     return 0;

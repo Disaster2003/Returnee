@@ -27,11 +27,15 @@ public:
 
         // 接地していた場合
         if (owner->isGrounded)
+        {
             // 下方向への加速度を0にする
             velocity.y = std::max(velocity.y, 0.0f);
+        }
         else
+        {
             // 重力加速度によって速度を更新する
             velocity.y -= gravity * gravity_scale * deltaTime;
+        }
 
         // 速度を座標に反映する
         owner->position += velocity * deltaTime;

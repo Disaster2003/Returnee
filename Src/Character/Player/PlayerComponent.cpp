@@ -140,16 +140,24 @@ void PlayerComponent::Update(float deltaTime)
 
 		// 前進する
 		if (engine->GetKey(GLFW_KEY_W))
+		{
 			Move(camera, deltaTime, -1, cameraSpeed * cameraSin * 2, cameraSpeed * cameraCos * 2);
+		}
 		// 後退する
 		if (engine->GetKey(GLFW_KEY_S))
+		{
 			Move(camera, deltaTime, 1, cameraSpeed * cameraSin * 1.5f, cameraSpeed * cameraCos * 1.5f);
+		}
 		// 左に移動する
 		if (engine->GetKey(GLFW_KEY_A))
+		{
 			Move(camera, deltaTime, -1, cameraSpeed * cameraCos, cameraSpeed * -cameraSin);
+		}
 		// 右に移動する
 		if (engine->GetKey(GLFW_KEY_D))
+		{
 			Move(camera, deltaTime, 1, cameraSpeed * cameraCos, cameraSpeed * -cameraSin);
+		}
 
 		// 走行音停止
 		if (!isRunning)
@@ -163,19 +171,27 @@ void PlayerComponent::Update(float deltaTime)
 
 		// マウスを横方向に動かした分、カメラのY軸回転を行う
 		if (abs(engine->GetMouseMovement().x) > 1)
+		{
 			camera.rotation.y -= engine->GetMouseMovement().x * deltaTime * SPEED_MOVE_CAMERA;
+		}
 
 		// マウスを縦方向に動かした分、カメラのX軸回転を行う
 		if (abs(engine->GetMouseMovement().y) > 1 &&
 			camera.rotation.x < CAMERA_ANGLE_MAX &&
 			camera.rotation.x > -CAMERA_ANGLE_MAX)
+		{
 			camera.rotation.x -= engine->GetMouseMovement().y * deltaTime * SPEED_MOVE_CAMERA;
+		}
 		// 上向きの限度
 		else if (camera.rotation.x >= CAMERA_ANGLE_MAX)
+		{
 			camera.rotation.x = CAMERA_ANGLE_MAX - 0.01f;
+		}
 		// 下向きの限度
 		else if (camera.rotation.x <= -CAMERA_ANGLE_MAX)
+		{
 			camera.rotation.x = -CAMERA_ANGLE_MAX + 0.01f;
+		}
 	}
 
 	// スペースキーが押されたら、ジャンプする
@@ -188,10 +204,13 @@ void PlayerComponent::Update(float deltaTime)
 	case PlayerComponent::STATE_SWORD::IDLE:
 		// 接地していたら、呼吸運動を行う
 		if (camera.isGrounded)
+		{
 			hand->rotation.x = sin(breath_scale) * 0.01f * ((isRunning) ? 30 : 5) + old_x;
+		}
 
 		// 1撃目の準備
-		if(time_swing <= 0)
+		if (time_swing <= 0)
+		{
 			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
 			{
 				// 剣の回転角度の設定
@@ -212,8 +231,10 @@ void PlayerComponent::Update(float deltaTime)
 				}
 				break;
 			}
+		}
 		// ガードの準備
-		if(time_guard <= 0)
+		if (time_guard <= 0)
+		{
 			if (engine->GetMouseButton(GLFW_MOUSE_BUTTON_RIGHT))
 			{
 				// 剣の回転角度を戻す
@@ -226,6 +247,7 @@ void PlayerComponent::Update(float deltaTime)
 				hand->rotation.y += radians(45);
 				break;
 			}
+		}
 		break;
 	case PlayerComponent::STATE_SWORD::FIRST_SWING:
 		// 剣を振り切ったら、2撃目の準備をする / 攻撃を終了する
@@ -343,18 +365,28 @@ void PlayerComponent::Update(float deltaTime)
 	{
 		// 無敵時間を減らす
 		if (time_invincible > 0)
+		{
 			time_invincible = std::max(time_invincible - deltaTime, 0.0f);
+		}
 		// 攻撃の待機時間
 		if (time_swing > 0)
+		{
 			time_swing -= deltaTime;
+		}
 		// ガードの待機時間
 		if (time_guard > 0)
+		{
 			time_guard -= deltaTime;
+		}
 		// 呼吸運動の大きさを加える
 		if (isRunning)
+		{
 			breath_scale += deltaTime * 10;
+		}
 		else
+		{
 			breath_scale += deltaTime;
+		}
 	}
 }
 
@@ -424,7 +456,9 @@ void PlayerComponent::Jump
 			gravity = 0;
 		}
 		else
+		{
 			characterMovement->DecelerateXZ(10 * deltaTime);
+		}
 	}
 }
 
@@ -449,13 +483,21 @@ void PlayerComponent::ClickCheck()
 {
 	// +1撃追加する
 	if (isFinishedClick)
+	{
 		if (GetOwner()->GetEngine()->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
+		{
 			isNextSwinging = true;
+		}
+	}
 
 	// クリック判定の終了
 	if (!isFinishedClick)
+	{
 		if (!GetOwner()->GetEngine()->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT))
+		{
 			isFinishedClick = true;
+		}
+	}
 }
 
 /// <summary>
@@ -481,9 +523,13 @@ void PlayerComponent::AttackInitialize
 
 		// ジャンプしてたら、ダメージ2倍
 		if (isJumping)
+		{
 			attackCollider_right_arm->SetDamage(ATTACK_SPECIAL);
+		}
 		else
+		{
 			attackCollider_right_arm->SetDamage(ATTAK_NORMAL);
+		}
 
 		// 攻撃判定を設定する
 		attackCollider_right_arm->Activate(2.0f);
@@ -536,10 +582,14 @@ void PlayerComponent::OnCollision
 
 	// alive以外の状態は衝突に反応しない
 	if (state_player != STATE_PLAYER::ALIVE)
+	{
 		return;
+	}
 	// Chestに触れたらゴールする
 	else if (targetObject->name == "Chest")
+	{
 		state_player = STATE_PLAYER::GOAL;
+	}
 }
 
 /// <summary>
@@ -555,7 +605,9 @@ void PlayerComponent::TakeDamage
 {
 	// 無敵時間中は攻撃を無効化
 	if (time_invincible > 0)
+	{
 		return;
+	}
 
 	// ダメージを受けた音を再生する
 	EasyAudio::PlayOneShot(SE::player_damage);
@@ -579,8 +631,10 @@ void PlayerComponent::TakeDamage
 		EasyAudio::PlayOneShot(SE::player_dead);
 	}
 	else
+	{
 		// 無敵時間をつくる
 		time_invincible = 0.2f;
+	}
 
 	// ダメージの反動
 	const vec3 v = normalize(GetOwner()->position - causer->position);
@@ -629,9 +683,13 @@ void PlayerComponent::HpGauge(Engine* engine, float deltaTime)
 
 	// 体力ゲージの増減を計算させる
 	if (current_ratio > targetRatio)
+	{
 		current_ratio = std::max(current_ratio - deltaTime * 0.5f, targetRatio);
+	}
 	else if (current_ratio < targetRatio)
+	{
 		current_ratio = std::min(current_ratio + deltaTime * 0.5f, targetRatio);
+	}
 
 	// ゲージ全体のスケーリング
 	switch (scalingMode)
@@ -646,7 +704,9 @@ void PlayerComponent::HpGauge(Engine* engine, float deltaTime)
 		break;
 	case SCALING_MODE::STATIONARY:
 		if (current_ratio <= 0)
+		{
 			scalingMode = SCALING_MODE::CLOSE;
+		}
 		break;
 
 	case SCALING_MODE::CLOSE:

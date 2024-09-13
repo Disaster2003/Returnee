@@ -108,12 +108,18 @@ void Draw
 	{
 		hasUniformColor = glGetUniformLocation(program, "color") >= 0;
 		if (hasUniformColor)
+		{
 			glGetUniformfv(program, 100, &objectColor.x);
+		}
 	}
 	if (hasUniformColor)
+	{
 		Draw(mesh.drawParamsList, program, materials, &objectColor);
+	}
 	else
+	{
 		Draw(mesh.drawParamsList, program, materials, nullptr);
+	}
 }
 
 
@@ -146,8 +152,10 @@ void Draw
 			}
 			// ラフネスとメタリックを設定
 			if (locRoughnessAndMetallic >= 0)
+			{
 				glProgramUniform2f(program, locRoughnessAndMetallic,
 					material.roughness, material.metallic);
+			}
 			if (material.texBaseColor)
 			{
 				const GLuint tex = *material.texBaseColor;
@@ -159,14 +167,18 @@ void Draw
 				glBindTextures(1, 1, &tex);
 			}
 			else
+			{
 				glBindTextures(1, 1, nullptr); // テクスチャ1を未設定にする
+			}
 			if (material.texNormal)
 			{
 				const GLuint tex = *material.texNormal;
 				glBindTextures(3, 1, &tex);
 			}
 			else
+			{
 				glBindTextures(3, 1, nullptr);
+			}
 		}
 
 		glDrawElementsBaseVertex
@@ -223,7 +235,9 @@ std::vector<MaterialPtr> MeshBuffer::LoadMTL
 
 				// テクスチャが設定されていないマテリアルの場合、white.tgaを設定しておく
 				if (!pMaterial->texBaseColor)
+				{
 					pMaterial->texBaseColor = textureCallback("Res/white.tga");
+				}
 			}
 			pMaterial = std::make_shared<MATERIAL>();
 			pMaterial->name = name;
@@ -233,16 +247,22 @@ std::vector<MaterialPtr> MeshBuffer::LoadMTL
 
 		// マテリアルが定義されていない場合は行を無視する
 		if (!pMaterial)
+		{
 			continue;
+		}
 
 		// 基本色の読み取りを試みる
 		if (sscanf(line.data(), " Kd %f %f %f",
 			&pMaterial->baseColor.x, &pMaterial->baseColor.y, &pMaterial->baseColor.z) == 3)
+		{
 			continue;
+		}
 
 		// 不透明度の読み取りを試みる
 		if (sscanf(line.data(), " d %f", &pMaterial->baseColor.w) == 1)
+		{
 			continue;
+		}
 
 		// 基本色テクスチャ名の読み取りを試みる
 		char textureName[1000] = { 0 };
@@ -257,17 +277,23 @@ std::vector<MaterialPtr> MeshBuffer::LoadMTL
 		if (sscanf(line.data(), " Ke %f %f %f",
 			&pMaterial->emission.x, &pMaterial->emission.y,
 			&pMaterial->emission.z) == 3)
+		{
 			continue;
+		}
 
 		// 発光色テクスチャ名の読み取りを試みる
 		if (sscanf(line.data(), " map_Ke %999s", &textureName) == 1)
 		{
 			const std::string filename = foldername + textureName;
 			if (std::filesystem::exists(filename))
+			{
 				pMaterial->texEmission =
 					textureCallback(filename.c_str());
+			}
 			else
+			{
 				LOG_WARNING("%sを開けません", filename.c_str());
+			}
 
 			continue;
 		}
@@ -278,24 +304,34 @@ std::vector<MaterialPtr> MeshBuffer::LoadMTL
 		{
 			const std::string filename = foldername + textureName;
 			if (std::filesystem::exists(filename))
+			{
 				pMaterial->texNormal = textureCallback(filename.c_str());
+			}
 			else
+			{
 				LOG_WARNING("%sを開けません", filename.c_str());
+			}
 			continue;
 		} // map_bump
 
 		// スペキュラ色の読み取りを試みる
 		if (sscanf(line.data(), " Ks %f %f %f",
 			&specularColor.x, &specularColor.y, &specularColor.z) == 3)
+		{
 			continue;
+		}
 
 		// スペキュラ係数の読み取りを試みる
 		if (sscanf(line.data(), " Ns %f", &pMaterial->roughness) == 1)
+		{
 			continue;
+		}
 
 		// メタリックの読み取りを試みる
 		if (sscanf(line.data(), " Pm %f", &pMaterial->metallic) == 1)
+		{
 			continue;
+		}
 	}
 
 	// 最後のマテリアルのスペキュラパラメータを設定
@@ -308,7 +344,9 @@ std::vector<MaterialPtr> MeshBuffer::LoadMTL
 
 		// テクスチャが設定されていないマテリアルの場合、white.tgaを設定しておく
 		if (!pMaterial->texBaseColor)
+		{
 			pMaterial->texBaseColor = textureCallback("Res/white.tga");
+		}
 	}
 
 	// 読み込んだマテリアルの配列を返す
@@ -371,7 +409,9 @@ MeshBuffer::MeshBuffer(size_t buffer_size)
 	// タンジェント空間計算用のオブジェクトを作成する
 	mikkTSpace = std::make_shared<MikkTSpace>();
 	if (!mikkTSpace)
+	{
 		LOG_ERROR("MikkTSpaceの作成に失敗");
+	}
 }
 
 /// <summary>
@@ -384,12 +424,16 @@ StaticMeshPtr MeshBuffer::LoadOBJ(const char* filename)
 	// 以前に読み込んだファイルなら、作成済みのメッシュを返す
 	auto itr = meshes.find(filename);
 	if (itr != meshes.end())
+	{
 		return itr->second;
+	}
 
 	// OBJファイルからメッシュデータを作成する
 	MESH_DATA meshData = CreateMeshDataFromOBJ(filename);
 	if (meshData.vertices.empty())
+	{
 		return nullptr; // 読み込み失敗
+	}
 
 
 	// 変換したデータをバッファに追加する
@@ -442,13 +486,17 @@ SkeletalMeshPtr MeshBuffer::LoadOBJ
 	{
 		auto itr = skeletalMeshes.find(filename);
 		if (itr != skeletalMeshes.end())
+		{
 			return itr->second;
+		}
 	}
 
 	// OBJファイルからメッシュデータを作成する
 	MESH_DATA meshData = CreateMeshDataFromOBJ(filename);
 	if (meshData.vertices.empty())
+	{
 		return nullptr; // 読み込み失敗
+	}
 
 	// Vertexの共通部分をSkeletaVertexにコピー
 	std::vector<VERTEX_SKELETAL> skeletalVertices(meshData.vertices.size());
@@ -511,12 +559,18 @@ SkeletalMeshPtr MeshBuffer::LoadOBJ
 
 		// 影響度の合計が1になるように正規化する
 		if (total > 0)
+		{
 			for (auto& e : distanceList)
+			{
 				e.distance /= total;
+			}
+		}
 		else
+		{
 			// すべてのdistanceが0の(どのボーンからも遠すぎる)場合、
 			// 一番近いボーンのみ影響するように設定する
 			distanceList[0].distance = 1;
+		}
 
 		// 頂点に関節データを設定する
 		for (int i = 0; i < 4; ++i)
@@ -595,7 +649,9 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 	{
 		const size_t p = foldername.find_last_of("￥￥/");
 		if (p != std::string::npos)
+		{
 			foldername.resize(p + 1);
+		}
 	}
 
 	// OBJファイルを解析して、頂点データとインデックスデータを読み込む
@@ -667,7 +723,9 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 			for (;;)
 			{
 				if (sscanf(p, "%u/%u/%u%n", &f2.v, &f2.vt, &f2.vn, &readByte) != 3)
+				{
 					break;
+				}
 				p += readByte; // 読み取り位置を更新する
 				faceIndexSet.push_back(f0);
 				faceIndexSet.push_back(f1);
@@ -685,7 +743,9 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 			for (;;)
 			{
 				if (sscanf(p, "%u/%u%n", &f2.v, &f2.vt, &readByte) != 2)
+				{
 					break;
+				}
 				f2.vn = 0;	   // 法線なし
 				p += readByte; // 読み取り位置を更新する
 				faceIndexSet.push_back(f0);
@@ -736,8 +796,10 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 		// 対応表からキーに一致するデータを検索する
 		const auto itr = indexMap.find(key);
 		if (itr != indexMap.end())
+		{
 			// 対応表にあるので既存の頂点インデックスを使う
 			indices.push_back(itr->second);
+		}
 		else
 		{
 			// 対応表にないので新しい頂点データを作成し、頂点配列に追加する
@@ -777,13 +839,17 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 	// 仮データと番兵以外のマテリアルがある場合、仮データを飛ばす
 	size_t i = 0;
 	if (usemtls.size() > 2)
+	{
 		i = 1; // 仮データと番兵以外のマテリアルがある場合、仮データを飛ばす
+	}
 	for (; i < usemtls.size() - 1; ++i)
 	{
 		const USE_MATERIAL& cur = usemtls[i];	   // 使用中のマテリアル
 		const USE_MATERIAL& next = usemtls[i + 1]; // 次のマテリアル
 		if (next.startOffset == cur.startOffset)
+		{
 			continue; // インデックスデータがない場合は飛ばす
+		}
 
 		// 描画パラメータを作成
 		DRAW_PARAMS params;
@@ -793,12 +859,14 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 		params.baseVertex = baseVertex;
 		params.materialNo = 0; // デフォルト値を設定
 		for (int i = 0; i < materials.size(); ++i)
+		{
 			if (materials[i]->name == cur.name)
 			{
 				// 名前の一致するマテリアルを設定する
 				params.materialNo = i;
 				break;
 			}
+		}
 		meshData.drawParamsList.push_back(params);
 
 		// インデックスオフセットを変更する
@@ -808,9 +876,13 @@ MeshBuffer::MESH_DATA MeshBuffer::CreateMeshDataFromOBJ(const char* filename)
 
 	// マテリアル配列が空の場合、デフォルトマテリアルを追加する
 	if (materials.empty())
+	{
 		meshData.materials.push_back(std::make_shared<MATERIAL>());
+	}
 	else
+	{
 		meshData.materials.assign(materials.begin(), materials.end());
+	}
 
 	return meshData;
 }
@@ -895,7 +967,9 @@ StaticMeshPtr MeshBuffer::CreateStaticMesh
 	p->drawParamsList[0].materialNo = 0;
 	p->materials.push_back(std::make_shared<MATERIAL>());
 	if (texture_color_base)
+	{
 		p->materials[0]->texBaseColor = texture_color_base;
+	}
 	meshes.emplace(name, p);
 	return p;
 }
@@ -932,7 +1006,9 @@ void FillMissingNormals
 		// 法線の長さが0の場合を「設定されていない」とみなす
 		const vec3& n = vertices[i].normal;
 		if (n.x == 0 && n.y == 0 && n.z == 0)
+		{
 			missingNomals[i] = true;
+		}
 	}
 
 	// 法線を計算する
@@ -959,21 +1035,29 @@ void FillMissingNormals
 
 		// 法線が設定されていない頂点にだけ法線を加算する
 		if (missingNomals[i0])
+		{
 			vertices[i0].normal += normal;
+		}
 		if (missingNomals[i1])
+		{
 			vertices[i1].normal += normal;
+		}
 		if (missingNomals[i2])
+		{
 			vertices[i2].normal += normal;
+		}
 	}
 
 	// 法線を正規化する
 	for (int i = 0; i < vertexCount; ++i)
+	{
 		if (missingNomals[i])
 		{
 			vec3& n = vertices[i].normal;
 			const float l = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
 			n = { n.x / l,n.y / l,n.z / l };
 		}
+	}
 }
 
 /// <summary>
@@ -985,7 +1069,9 @@ StaticMeshPtr MeshBuffer::GetStaticMesh(const char* name) const
 {
 	auto itr = meshes.find(name);
 	if (itr != meshes.end())
+	{
 		return itr->second;
+	}
 
 	return nullptr;
 }
@@ -999,7 +1085,9 @@ SkeletalMeshPtr MeshBuffer::GetSkeletalMesh(const char* name) const
 {
 	auto itr = skeletalMeshes.find(name);
 	if (itr != skeletalMeshes.end())
+	{
 		return itr->second;
+	}
 
 	return nullptr;
 }

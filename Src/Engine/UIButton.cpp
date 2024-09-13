@@ -31,17 +31,23 @@ void UIButton::Update(float deltaTime)
 		// カーソルがボタン領域内にある
 		const bool buttonDown = engine->GetMouseButton(GLFW_MOUSE_BUTTON_LEFT);
 		if (buttonDown)
+		{
 			// 左ボタンが押されている
 			std::copy_n(&color_pressed.x, 3, &owner->color.x);
+		}
 		else
 		{
 			// 左ボタンが離されている
 			std::copy_n(&color_highlighted.x, 3, &owner->color.x);
 			// ボタンクリック判定
 			if (isPrevButtonDown)
+			{
 				// デリゲートを実行
 				for (auto& e : onClick)
+				{
 					e(this);
+				}
+			}
 		}	//if buttonDown
 
 		// マウスボタンの状態を更新
