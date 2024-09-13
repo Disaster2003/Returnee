@@ -7,6 +7,7 @@
 #include "../Player/PlayerComponent.h"
 #include "../../Effect/Smoke.h"
 #include "../../Engine/Random.h"
+#include "../../Engine/Debug.h"
 
 /// <summary>
 /// オークのコンポーネントを初期化する

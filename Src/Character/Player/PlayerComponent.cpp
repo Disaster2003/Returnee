@@ -20,6 +20,13 @@ public:
 	virtual void Update(float deltaTime) override
 	{
 		auto owner = GetOwner();
+		// nullチェック
+		if (!owner)
+		{
+			LOG_WARNING("ダメージ演出の赤枠が存在しません");
+			return;
+		}
+
 		// 一定時間経ったら
 		if (lifespan <= 0)
 		{
@@ -44,6 +51,12 @@ void PlayerComponent::Awake()
 {
 	auto owner = GetOwner();
 	auto engine = owner->GetEngine();
+	// nullチェック
+	if (!owner || !engine)
+	{
+		LOG_WARNING("プレイヤーが存在しません");
+		return;
+	}
 
 	// コライダーを設定する
 	// 球体コライダーを上下に並べて置くことで、縦長の衝突形状を再現
@@ -106,6 +119,13 @@ void PlayerComponent::Update(float deltaTime)
 {
 	Engine* engine = GetOwner()->GetEngine();
 	GameObject& camera = *GetOwner(); // engine->GetMainCamera();
+
+	// nullチェック
+	if (!engine || !&camera)
+	{
+		LOG_WARNING("プレイヤーが存在しません");
+		return;
+	}
 
 	characterMovement->DecelerateXZ(10 * deltaTime);
 
@@ -409,7 +429,9 @@ void PlayerComponent::Move
 	// 走行状態
 	isRunning = true;
 	if (!EasyAudio::IsPlaying(AudioPlayer::run))
+	{
 		EasyAudio::Play(AudioPlayer::run, SE::player_run, 1, true);
+	}
 
 	// PlusOrMinus方向に移動する
 	camera.position.x += deltaTime * x_movement_amount * PlusOrMinus;
@@ -472,6 +494,13 @@ void PlayerComponent::SwordSwing
 	float& rotation_hand
 )
 {
+	// nullチェック
+	if (!rotation_hand)
+	{
+		LOG_WARNING("handの参照に失敗しました");
+		return;
+	}
+
 	rotation_hand += (POWER_BASE - anti_power) * deltaTime;
 	anti_power += deltaTime * 0.01f;
 }
@@ -578,6 +607,17 @@ void PlayerComponent::OnCollision
 	const ComponentPtr& other
 )
 {
+	if (!self)
+	{
+		LOG_WARNING("プレイヤーが存在しません");
+		return;
+	}
+	if(!other)
+	{
+		LOG_WARNING("敵が存在しません");
+		return;
+	}
+
 	auto targetObject = other->GetOwner();
 
 	// alive以外の状態は衝突に反応しない
@@ -596,13 +636,20 @@ void PlayerComponent::OnCollision
 /// ダメージを受ける
 /// </summary>
 /// <param name="damage">ダメージ量</param>
-/// <param name="causer">自身</param>
+/// <param name="causer">ダメージを与えてきたオブジェクト</param>
 void PlayerComponent::TakeDamage
 (
 	int damage,
 	GameObject* causer
 )
 {
+	// nullチェック
+	if (!causer)
+	{
+		LOG_WARNING("ダメージを与えてきたオブジェクトが参照できません");
+		return;
+	}
+
 	// 無敵時間中は攻撃を無効化
 	if (time_invincible > 0)
 	{

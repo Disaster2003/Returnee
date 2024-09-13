@@ -4,6 +4,7 @@
 #ifndef SWORDSWINGEFFECT_H_INCLUDED
 #define SWORDSWINGEFFECT_H_INCLUDED
 #include "Particle.h"
+#include "../Engine/Debug.h"
 
 /// <summary>
 /// ŽaŒ‚Õ
@@ -28,6 +29,12 @@ public:
 
         auto owner = GetOwner();
         auto engine = owner->GetEngine();
+        // nullƒ`ƒFƒbƒN
+        if (!owner || !engine)
+        {
+            LOG_WARNING("ŽaŒ‚Õ‚ª‘¶Ý‚µ‚Ü‚¹‚ñ");
+            return;
+        }
         owner->materials[0]->texBaseColor = engine->GetTexture("Res/effect_swing.tga");
         owner->materials[0]->texEmission = engine->GetTexture("Res/effect_swing.tga");
         owner->materials[0]->baseColor = { 0.2f, 0.5f, 1.5f, 1 };

@@ -4,6 +4,7 @@
 #ifndef PARTICLE_H_INCLUDED
 #define PARTICLE_H_INCLUDED
 #include "../Engine/Billboard.h"
+#include "../Engine/Debug.h"
 
 /// <summary>
 /// パーティクルの基底クラス
@@ -27,6 +28,12 @@ public:
     {
         auto owner = GetOwner();
         auto engine = owner->GetEngine();
+        // nullチェック
+        if (!owner || !engine)
+        {
+            LOG_WARNING("パーティクルの基底クラスが存在しません");
+            return;
+        }
         owner->AddComponent<Billboard>(); // ビルボード化
         owner->staticMesh = engine->GetStaticMesh("plane_xy");
         owner->materials = CloneMaterialList(owner->staticMesh);
@@ -40,6 +47,12 @@ public:
     virtual void Update(float deltaTime) override
     {
         auto owner = GetOwner();
+        // nullチェック
+        if (!owner)
+        {
+            LOG_WARNING("パーティクルの基底クラスが存在しません");
+            return;
+        }
         // 一定時間経過したら
         if (life_span <= 0)
         {

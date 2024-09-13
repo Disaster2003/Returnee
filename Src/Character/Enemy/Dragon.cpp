@@ -7,6 +7,7 @@
 #include "../Player/PlayerComponent.h"
 #include "../../Effect/Smoke.h"
 #include "../../Engine/Random.h"
+#include "../../Engine/Debug.h"
 
 /// <summary>
 /// ドラゴンのコンポーネントを初期化する
@@ -15,6 +16,12 @@ void Dragon::Awake()
 {
 	auto owner = GetOwner();
 	auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // コンポーネントを設定する
 	for (float i = 0; i < 2; ++i)
@@ -49,6 +56,12 @@ void Dragon::Update(float deltaTime)
 {
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // プレイヤーが存在したら
     if (GetTarget())
@@ -131,13 +144,20 @@ void Dragon::Update(float deltaTime)
 /// ダメージを受ける
 /// </summary>
 /// <param name="damage">ダメージ量</param>
-/// <param name="causer">自身</param>
+/// <param name="causer">ダメージを与えてきたオブジェクト</param>
 void Dragon::TakeDamage
 (
     int damage,
     GameObject* causer
 )
 {
+    // nullチェック
+    if (!causer)
+    {
+        LOG_WARNING("ダメージを与えてきたオブジェクトが参照できません");
+        return;
+    }
+
     // 状態が「死亡」なら何も起こらない
     if (state == STATE_DRAGON::DEAD)
         return;
@@ -219,6 +239,13 @@ void Dragon::StartAttack()
         return;
     }
 
+    // nullチェック
+    if (!attackCollider_right_arm)
+    {
+        LOG_WARNING("ドラゴンの右手コライダーが存在しません");
+        return;
+    }
+
     if (animator)
     {
         // 「攻撃」アニメーションを再生する
@@ -275,6 +302,13 @@ void Dragon::StartAttackTail()
         return;
     }
 
+    // nullチェック
+    if (!attackCollider_tail)
+    {
+        LOG_WARNING("ドラゴンの尻尾コライダーが存在しません");
+        return;
+    }
+
     if (animator)
     {
         // 「尻尾攻撃」アニメーションを再生する
@@ -312,13 +346,19 @@ void Dragon::StartAttackFireBall()
 
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // 正面を決定する
-    const vec3 dirFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
+    const vec3 directionFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
 
     // 発動を表す煙を表示する
     constexpr vec3 spawnOffset = { 0, 3.0f, 0 };
-    const vec3 spawnPosition = owner->position + dirFront + spawnOffset;
+    const vec3 spawnPosition = owner->position + directionFront + spawnOffset;
     auto smoke = engine->Create<GameObject>("smoke", spawnPosition);
     smoke->AddComponent<Smoke>();
 
@@ -408,13 +448,19 @@ void Dragon::StartHoveringAndFire()
 
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // 正面を決定する
-    const vec3 dirFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
+    const vec3 directionFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
 
     // 発動を表す煙を表示する
     constexpr vec3 spawnOffset = { 0, 3.0f, 0 };
-    const vec3 spawnPosition = owner->position + dirFront + spawnOffset;
+    const vec3 spawnPosition = owner->position + directionFront + spawnOffset;
     auto smoke = engine->Create<GameObject>("smoke", spawnPosition);
     smoke->AddComponent<Smoke>();
 
@@ -447,6 +493,18 @@ void Dragon::StartDead()
         return;
     }
 
+    // nullチェック
+    if (!attackCollider_right_arm)
+    {
+        LOG_WARNING("ドラゴンの右手コライダーが存在しません");
+        return;
+    }
+    if (!attackCollider_tail)
+    {
+        LOG_WARNING("ドラゴンの尻尾コライダーが存在しません");
+        return;
+    }
+
     if (animator)
     {
         // 「死」アニメーションを再生する
@@ -470,6 +528,13 @@ void Dragon::DoWait(float deltaTime)
 {
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
+
     if (time_walk > 0)
     {
         time_walk -= deltaTime;
@@ -488,9 +553,9 @@ void Dragon::DoWait(float deltaTime)
         else
         {
             // 目的地に向かって移動中
-            const vec3 dirFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
+            const vec3 directionFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
             const vec3 nv = v * (1 / sqrt(d2));
-            const float sinθ = cross(dirFront, nv).y;
+            const float sinθ = cross(directionFront, nv).y;
             owner->rotation.y += 5 * sinθ * deltaTime;
             characterMovement->AccelerateXZ(5 * nv * deltaTime, 1);
         }
@@ -545,6 +610,12 @@ void Dragon::DoWalk(float deltaTime)
 {
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // 視認距離にプレイヤーがいなかったら
     const auto targetInfo = GetTargetInfo();
@@ -560,8 +631,8 @@ void Dragon::DoWalk(float deltaTime)
     time_attack_fire_ball = std::max(time_attack_fire_ball - deltaTime, 0.0f);
     time_hovering = std::max(time_hovering - deltaTime, 0.0f);
 
-    const vec3 dirFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
-    const vec3 dirLeft = { cos(owner->rotation.y), 0, -sin(owner->rotation.y) };
+    const vec3 directionFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
+    const vec3 directionLeft = { cos(owner->rotation.y), 0, -sin(owner->rotation.y) };
 
     if (time_hovering <= 0)
     {
@@ -613,17 +684,17 @@ void Dragon::DoWalk(float deltaTime)
     {
         if (isAngry)
         {
-            characterMovement->AccelerateXZ(dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY * 0.5f);
+            characterMovement->AccelerateXZ(directionFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY * 0.5f);
         }
         else
         {
-            characterMovement->AccelerateXZ(dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
+            characterMovement->AccelerateXZ(directionFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
         }
     }
     else
     {
         // 逆方向に加速(減速)する
-        characterMovement->AccelerateXZ(-dirFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
+        characterMovement->AccelerateXZ(-directionFront * SPEED_MOVE_ENEMY * accel * deltaTime, SPEED_MOVE_ENEMY);
     }
 }
 
@@ -713,6 +784,7 @@ void Dragon::DoHovering(float deltaTime)
             StartWalk();
         }
         else
+        {
             for (int i = 11; i >= 0; i--)
             {
                 if (destination.x == position_hovering[i].x &&
@@ -735,13 +807,14 @@ void Dragon::DoHovering(float deltaTime)
                     break;
                 }
             }
+        }
     }
     else
     {
         // 目的地に向かって移動中
-        const vec3 dirFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
+        const vec3 directionFront = { sin(owner->rotation.y), 0, cos(owner->rotation.y) };
         const vec3 nv = v * (1 / sqrt(d2));
-        const float sinθ = cross(dirFront, nv).y;
+        const float sinθ = cross(directionFront, nv).y;
         owner->rotation.y += 5 * sinθ * deltaTime;
         characterMovement->AccelerateXZ(30 * nv * deltaTime, 6);
         characterMovement->AccelerateY(30 * nv * deltaTime, 6);
@@ -754,7 +827,12 @@ void Dragon::DoHovering(float deltaTime)
 /// <param name="deltaTime"></param>
 void Dragon::DoHoveringAndFire(float deltaTime)
 {
-    auto owner = GetOwner();
+    auto owner = GetOwner();    // nullチェック
+    if (!owner)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // アニメーションが終了したら
     if (!animator->IsPlaying())
@@ -799,6 +877,12 @@ void Dragon::DoDead(float deltaTime)
 {
     auto owner = GetOwner();
     auto engine = owner->GetEngine();
+    // nullチェック
+    if (!owner || !engine)
+    {
+        LOG_WARNING("ドラゴンが存在しません");
+        return;
+    }
 
     // 停止する
     characterMovement->DecelerateXZ(DECELERATION * deltaTime);

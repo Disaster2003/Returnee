@@ -4,6 +4,7 @@
 #ifndef MAGICMISSILEPARTICLE_H_INCLUDED
 #define MAGICMISSILEPARTICLE_H_INCLUDED
 #include "Particle.h"
+#include "../Engine/Debug.h"
 
 /// <summary>
 /// 火炎弾の軌跡パーティクル
@@ -28,6 +29,12 @@ public:
 
         auto owner = GetOwner();
         auto engine = owner->GetEngine();
+        // nullチェック
+        if (!owner || !engine)
+        {
+            LOG_WARNING("火球の軌跡が存在しません");
+            return;
+        }
         owner->materials[0]->texBaseColor = engine->GetTexture("Res/particle_fire.tga");
         owner->materials[0]->baseColor = { 0, 0, 0, 1 }; // ライトの影響をなくす
         owner->materials[0]->emission = { 2.0f, 1.0f, 0.5f };
@@ -42,6 +49,12 @@ public:
     virtual void Update(float deltaTime) override
     {
         auto owner = GetOwner();
+        // nullチェック
+        if (!owner)
+        {
+            LOG_WARNING("火球の軌跡が存在しません");
+            return;
+        }
         owner->materials[0]->baseColor.w -= deltaTime; // 徐々に透明化
         // 徐々に発光
         owner->materials[0]->emission =

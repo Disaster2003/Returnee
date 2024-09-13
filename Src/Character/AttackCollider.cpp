@@ -3,6 +3,7 @@
 */
 #include "AttackCollider.h"
 #include "../Engine/Engine.h"
+#include "../Engine/Debug.h"
 
 /// <summary>
 /// コライダーを初期化する
@@ -63,6 +64,13 @@ void AttackCollider::Update(float deltaTime)
 /// <param name="collider_sphere_radius">攻撃範囲</param>
 void AttackCollider::Activate(float collider_sphere_radius)
 {
+    // nullチェック
+    if (!collider)
+    {
+        LOG_WARNING("コライダーが存在しません");
+        return;
+    }
+
     if (state == STATE_ATTACK_COLLIDER::SLEEP)
     {
         state = STATE_ATTACK_COLLIDER::COLLISION_ENABLE;

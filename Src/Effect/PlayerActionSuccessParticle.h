@@ -4,6 +4,7 @@
 #ifndef PLAYERACTIONSUCCESSPARTICLE_H_INCLUDED
 #define PLAYERACTIONSUCCESSPARTICLE_H_INCLUDED
 #include "Particle.h"
+#include "../Engine/Debug.h"
 
 /// <summary>
 /// プレイヤーの行動が実った時に出すパーティクル
@@ -28,6 +29,12 @@ public:
 
         auto owner = GetOwner();
         auto engine = owner->GetEngine();
+        // nullチェック
+        if (!owner || !engine)
+        {
+            LOG_WARNING("プレイヤー用の演出が存在しません");
+            return;
+        }
         owner->materials[0]->baseColor = { 0.2f, 0.5f, 1.5f, 1 };
         owner->materials[0]->emission = { 0.2f, 0.5f, 1.5f };
         owner->scale = vec3(0.1f + static_cast<float>(rand() % 4) * 0.1f);
@@ -46,6 +53,12 @@ public:
     virtual void Update(float deltaTime) override
     {
         auto owner = GetOwner();
+        // nullチェック
+        if (!owner)
+        {
+            LOG_WARNING("プレイヤー用の演出が存在しません");
+            return;
+        }
         velocity.y -= 9.81f * deltaTime;
         owner->position += velocity * deltaTime;          // 上に移動
         owner->rotation.z += random_rotation * deltaTime; // 回転

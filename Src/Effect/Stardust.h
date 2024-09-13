@@ -5,6 +5,7 @@
 #define STARDUST_H_INCLUDED
 #include "Particle.h"
 #include "../Engine/Random.h"
+#include "../Engine/Debug.h"
 
 // キラキラ
 class Stardust
@@ -29,6 +30,12 @@ public:
 		// パーティクルの相違点を初期化する
 		auto owner = GetOwner();
 		auto engine = owner->GetEngine();
+		// nullチェック
+		if (!owner || !engine)
+		{
+			LOG_WARNING("キラキラが存在しません");
+			return;
+		}
 		owner->materials[0]->texBaseColor = engine->GetTexture("Res/particle_star.tga");
 		owner->materials[0]->baseColor = { 0, 0, 0, 1 };      // ライトの影響をなくす
 		owner->materials[0]->emission = { 3.0f, 3.0f, 0.2f }; // 強い黄
@@ -44,7 +51,12 @@ public:
 	{
 		auto owner = GetOwner();
 		auto engine = owner->GetEngine();
-
+		// nullチェック
+		if (!owner || !engine)
+		{
+			LOG_WARNING("キラキラが存在しません");
+			return;
+		}
 		owner->position += delta_position * deltaTime;    // 上に移動
 		owner->rotation.z += float(sin(120)) * deltaTime; // 回転
 		owner->color.w -= deltaTime;					  // 徐々に透明化

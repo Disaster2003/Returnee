@@ -5,6 +5,7 @@
 #include "PlayerComponent.h"
 #include "../Enemy/Dragon.h"
 #include "../Enemy/Orc.h"
+#include "../../Engine/Debug.h"
 
 /// <summary>
 /// 衝突時に衝突した相手によって処理を行う
@@ -17,6 +18,18 @@ void WeaponAttackCollider::OnCollision
     const ComponentPtr& other
 )
 {
+    // nullチェック
+    if (!self)
+    {
+        LOG_WARNING("武器のコライダーが存在しません");
+        return;
+    }
+    if (!other)
+    {
+        LOG_WARNING("敵が存在しません");
+        return;
+    }
+
     // 攻撃判定が起動してなかったら、何も起こさない
     if (WeaponAttackCollider::GetState() != STATE_ATTACK_COLLIDER::COLLISION_ENABLE)
     {

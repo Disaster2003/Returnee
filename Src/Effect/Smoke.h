@@ -28,6 +28,13 @@ public:
 
         auto owner = GetOwner();
         auto engine = owner->GetEngine();
+        // nullチェック
+        if (!owner || !engine)
+        {
+            LOG_WARNING("煙が存在しません");
+            return;
+        }
+
         owner->materials[0]->texBaseColor = engine->GetTexture("Res/particle_fire.tga");
         owner->materials[0]->baseColor = { 0.05f, 0.025f, 0.05f, 1 }; // ライトの影響をなくす
         owner->materials[0]->emission = { 0.05f, 0.025f, 0.05f };
@@ -44,6 +51,13 @@ public:
     virtual void Update(float deltaTime) override
     {
         auto owner = GetOwner();
+        // nullチェック
+        if (!owner)
+        {
+            LOG_WARNING("煙が存在しません");
+            return;
+        }
+
         owner->position.y += 0.5f * deltaTime;        // 上に移動
         owner->rotation.z += 0.57f * deltaTime;       // 回転
         owner->scale += vec3(0.75f * deltaTime);      // 徐々に拡大

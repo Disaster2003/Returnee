@@ -8,6 +8,7 @@
 #include "../Engine/Billboard.h"
 #include "../Engine/Random.h"
 #include "../Engine/Engine.h"
+#include "../Engine/Debug.h"
 
 /// <summary>
 /// 霧コンポーネント
@@ -96,6 +97,12 @@ public:
 
 		auto owner = GetOwner();
 		auto engine = owner->GetEngine();
+		// nullチェック
+		if (!owner || !engine)
+		{
+			LOG_WARNING("霧が存在しません");
+			return;
+		}
 
 		// 霧を発生させる位置をランダムに選択
 		vec3 pos = owner->position;
